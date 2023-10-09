@@ -68,6 +68,14 @@ class HeatCurve {
     _calculateError(currentTemperature);
   }
 
+  bool get isFinished {
+    return currentIndex == curve.length - 1;
+  }
+
+  bool get isFailed {
+    return accruedError > maxError;
+  }
+
   int get targetTemperature {
     return curve.keys.elementAt(currentIndex);
   }
