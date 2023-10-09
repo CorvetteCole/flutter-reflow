@@ -1,18 +1,5 @@
 enum TmsState { idle, heating, cooling, error, unknown }
 
-// enum TmsError {
-//   none,
-//   doorOpenedDuringHeating,
-//   targetTemperatureTooLow,
-//   targetTemperatureTooHigh,
-//   currentTemperatureTooLow,
-//   currentTemperatureTooHigh,
-//   uiTimeout,
-//   currentTemperatureRoseTooQuickly,
-//   currentTemperatureFellTooQuickly,
-//   unknown
-// }
-
 enum TmsError {
   none('No error'),
   doorOpenedDuringHeating('Door opened during heating'),
