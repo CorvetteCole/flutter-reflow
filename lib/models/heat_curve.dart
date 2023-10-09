@@ -10,10 +10,6 @@ class HeatCurve {
   double temperatureErrorWeight = 0.5;
   double singlePointTimeErrorWeight = 0.5;
 
-  // needs:
-  // - list of temperatures and times, relative to the start of this curve
-  // - current target temperature (and time)
-
   DateTime started = DateTime.now();
 
   double currentIndexStartError = 0;
@@ -60,6 +56,19 @@ class HeatCurve {
   }
 
   void calculateTarget(int currentTemperature) {
+    // TODO consider the following:
+    // - what do we do if we hit the target before the desired time?
+    // - should we interpolate between points?
+    // - current algorithm punishes segments after the total curve duration more
+    // than segments before it (good?)
+    // - _calculateError is not temporally stable. The more you call it, the
+    // faster error will accrue. Maybe we should internally track error
+    // per-point to make decisions on whether to move on and only update the
+    // accrued error when we move on to the next point?
+    // - per point time error is weighted less if the point is a small part of
+    // the curve, but this may not be desirable
+    // - do we want to move on at all if the temperature is not where we want
+    // it? That puts following segments at risk of not being reached either
     if (targetTemperature - currentTemperature == 0 ||
         currentIndexStartError > maxErrorPerPoint) {
       _iterateCurve();
