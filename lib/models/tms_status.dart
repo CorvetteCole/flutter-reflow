@@ -13,7 +13,7 @@ enum TmsState { idle, heating, cooling, error, unknown }
 //   unknown
 // }
 
-enum TmsError implements Comparable<TmsError> {
+enum TmsError {
   none(friendlyMessage: 'No error'),
   doorOpenedDuringHeating(friendlyMessage: 'Door opened during heating'),
   targetTemperatureTooLow(friendlyMessage: 'Target temperature too low'),
