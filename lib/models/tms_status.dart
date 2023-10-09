@@ -14,19 +14,19 @@ enum TmsState { idle, heating, cooling, error, unknown }
 // }
 
 enum TmsError {
-  none(friendlyMessage: 'No error'),
-  doorOpenedDuringHeating(friendlyMessage: 'Door opened during heating'),
-  targetTemperatureTooLow(friendlyMessage: 'Target temperature too low'),
-  targetTemperatureTooHigh(friendlyMessage: 'Target temperature too high'),
-  currentTemperatureTooLow(friendlyMessage: 'Current temperature too low'),
-  currentTemperatureTooHigh(friendlyMessage: 'Current temperature too high'),
-  currentTemperatureRoseTooQuickly(friendlyMessage: 'Current temperature rose too quickly'),
-  currentTemperatureFellTooQuickly(friendlyMessage: 'Current temperature fell too quickly'),
-  uiTimeout(friendlyMessage: 'UI timeout'),
-  unknown(friendlyMessage: 'Unknown error');
+  none('No error'),
+  doorOpenedDuringHeating('Door opened during heating'),
+  targetTemperatureTooLow('Target temperature too low'),
+  targetTemperatureTooHigh('Target temperature too high'),
+  currentTemperatureTooLow('Current temperature too low'),
+  currentTemperatureTooHigh('Current temperature too high'),
+  currentTemperatureRoseTooQuickly('Current temperature rose too quickly'),
+  currentTemperatureFellTooQuickly('Current temperature fell too quickly'),
+  uiTimeout('UI timeout'),
+  unknown('Unknown error');
 
   final String friendlyMessage;
-  const TmsError({required this.friendlyMessage});
+  const TmsError(this.friendlyMessage);
 }
 
 class TmsStatus {
