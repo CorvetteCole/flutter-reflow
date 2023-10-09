@@ -13,10 +13,12 @@ enum TmsError {
   unknown('Unknown error');
 
   final String friendlyMessage;
+
   const TmsError(this.friendlyMessage);
 }
 
 class TmsStatus {
+  final DateTime lastUpdated = DateTime.now();
   final int targetTemperature;
   final int currentTemperature;
   final TmsState state;
@@ -36,6 +38,6 @@ class TmsStatus {
             orElse: () => TmsState.unknown),
         error = json['error']
             ? TmsError.values.firstWhere((e) => e.name == json['error'],
-            orElse: () => TmsError.unknown)
+                orElse: () => TmsError.unknown)
             : TmsError.none;
 }
