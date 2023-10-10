@@ -30,6 +30,8 @@ dependencies:
   flutter:
     sdk: flutter
   libserialport: ^0.3.0+1
+  logging: ^1.1.0
+  provider: ^6.0.5
 
 dev_dependencies:
   flutter_test:
