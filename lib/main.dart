@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:libserialport/libserialport.dart';
-import 'package:flutter_reflow/widgets/curve_card.dart';
+import 'package:flutter_reflow/screens/curve_select.dart';
+import 'package:flutter_reflow/screens/info.dart';
+import 'package:flutter_reflow/screens/settings.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_reflow/widgets/status_bar.dart';
@@ -33,7 +35,7 @@ void main() async {
   // Must add this line.
   await windowManager.ensureInitialized();
 
-  WindowOptions windowOptions = WindowOptions(
+  WindowOptions windowOptions = const WindowOptions(
     size: Size(320, 480),
     center: true,
     // backgroundColor: Colors.transparent,
@@ -56,7 +58,6 @@ class BasicApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       scrollBehavior: MyCustomScrollBehavior(),
-      title: 'Flutter Demo',
       theme: ThemeData(
           useMaterial3: true, colorSchemeSeed: const Color(0xff001748)),
       darkTheme: ThemeData.dark(),
@@ -77,7 +78,7 @@ class _RootPageState extends State<RootPage> {
   int _selectedIndex = 0;
 
   static const List<Widget> _pages = <Widget>[
-    HomePage(),
+    CurveSelectPage(),
     InfoPage(),
     SettingsPage(),
   ];
@@ -91,7 +92,7 @@ class _RootPageState extends State<RootPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: StatusBar(),
+      appBar: const StatusBar(),
       body: Center(
         child: _pages.elementAt(_selectedIndex),
       ),
@@ -117,48 +118,5 @@ class _RootPageState extends State<RootPage> {
         ],
       ),
     );
-  }
-}
-
-class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Select Profile', style: TextStyle(fontSize: 40))),
-        body: ScrollConfiguration(
-        behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-        child: ListView(
-          padding: const EdgeInsets.all(10),
-          children: [
-            CurveCard(),
-            CurveCard(),
-            CurveCard(),
-            CurveCard(),
-            CurveCard(),
-            CurveCard(),
-            CurveCard(),
-            CurveCard(),
-          ],
-        )));
-  }
-}
-
-class InfoPage extends StatelessWidget {
-  const InfoPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Info Page'));
-  }
-}
-
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Settings Page'));
   }
 }
