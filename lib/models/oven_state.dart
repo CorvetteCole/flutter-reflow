@@ -5,7 +5,7 @@ enum OvenState { idle, heating, cooling, error }
 
 // need to catch non-TMS error of accrued difference between target and current
 // temperature becoming too large
-enum OvenErrorType { none, tms, temperatureDifference }
+enum OvenErrorType { none, tms, local }
 
 class OvenStatus {
   final int temperature;
