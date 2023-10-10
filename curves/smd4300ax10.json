@@ -1,0 +1,6 @@
+{
+   "name": "Leaded"
+   "model":"SMD4300AX10",
+   "manufacturer":"Chip Quik©",
+   "points":[[0,25],[30,100],[120,150],[150,183],[210,235],[240,183]]
+}
