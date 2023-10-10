@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// The preferred height of the status bar
-const statusBarHeight = 35.0;
+const statusBarHeight = 32.0;
 
 /// The elevation of the statusBar
 // TODO: would prefer not to use this at all
@@ -30,13 +30,15 @@ class StatusBar extends StatelessWidget implements PreferredSizeWidget {
         shadowColor: appBarTheme.shadowColor,
         surfaceTintColor: appBarTheme.surfaceTintColor,
         shape: appBarTheme.shape,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Temperature(),
-            const ConnectionStatus(),
-          ],
-        ));
+        child: Container(
+            padding: const EdgeInsets.all(4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Temperature(),
+                const ConnectionStatus(),
+              ],
+            )));
   }
 
   @override
@@ -48,20 +50,18 @@ class Temperature extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        padding: const EdgeInsets.all(4),
-        child: Row(children: [
-          Icon(Icons.thermostat_outlined,
-              size: 24, color: Theme.of(context).colorScheme.onBackground),
-          Text(
-            '165°C',
-            style: TextStyle(
-                fontWeight: FontWeight.w400,
-                fontSize: 16,
-                color: Theme.of(context).colorScheme.onBackground),
-            textAlign: TextAlign.center,
-          ),
-        ]));
+    return Row(children: [
+      Icon(Icons.thermostat_outlined,
+          size: 24, color: Theme.of(context).colorScheme.onBackground),
+      Text(
+        '165°C',
+        style: TextStyle(
+            fontWeight: FontWeight.w400,
+            fontSize: 16,
+            color: Theme.of(context).colorScheme.onBackground),
+        textAlign: TextAlign.center,
+      ),
+    ]);
   }
 }
 
