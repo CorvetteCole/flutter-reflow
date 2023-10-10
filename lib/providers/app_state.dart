@@ -1,0 +1,1 @@
+// provide some stuff in here, basically like should the back button be visible? other stuff maybe too

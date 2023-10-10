@@ -36,7 +36,7 @@ class Point {
   }
 }
 
-class Curve {
+class HeatCurve2 {
   final List<Point> _points;
 
   // empty iterator to start
@@ -45,7 +45,7 @@ class Curve {
   DateTime? _finished;
   bool _isFinished = false;
 
-  Curve(this._points) {
+  HeatCurve2(this._points) {
     // check if points are ordered by duration to form a valid curve, throw error if not
     for (var i = 0; i < _points.length - 1; i++) {
       if (_points.elementAt(i).duration > _points.elementAt(i + 1).duration) {

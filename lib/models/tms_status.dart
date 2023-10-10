@@ -23,12 +23,14 @@ class TmsStatus {
   final int currentTemperature;
   final TmsState state;
   final TmsError error;
+  final bool isDoorOpen;
 
   TmsStatus({
     required this.targetTemperature,
     required this.currentTemperature,
     required this.state,
     required this.error,
+    required this.isDoorOpen,
   });
 
   TmsStatus.fromJson(Map<String, dynamic> json)
@@ -39,5 +41,6 @@ class TmsStatus {
         error = json['error']
             ? TmsError.values.firstWhere((e) => e.name == json['error'],
                 orElse: () => TmsError.unknown)
-            : TmsError.none;
+            : TmsError.none,
+        isDoorOpen = json['door_open'];
 }

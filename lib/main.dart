@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:libserialport/libserialport.dart';
+import 'package:flutter_reflow/widgets/curve_card.dart';
+import 'package:window_manager/window_manager.dart';
+import 'package:flutter/gestures.dart';
 
-void main() {
+class MyCustomScrollBehavior extends MaterialScrollBehavior {
+  // Override behavior methods and getters like dragDevices
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        // etc.
+      };
+}
 
+void main() async {
   print('Available ports:');
   var i = 0;
   for (final name in SerialPort.availablePorts) {
@@ -16,21 +28,95 @@ void main() {
     sp.dispose();
   }
 
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  // Must add this line.
+  await windowManager.ensureInitialized();
+
+  WindowOptions windowOptions = WindowOptions(
+    size: Size(320, 480),
+    center: true,
+    // backgroundColor: Colors.transparent,
+    // skipTaskbar: false,
+    // titleBarStyle: TitleBarStyle.hidden,
+  );
+  windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
+
+  runApp(const BasicApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class BasicApp extends StatelessWidget {
+  const BasicApp({Key? key}) : super(key: key);
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scrollBehavior: MyCustomScrollBehavior(),
       title: 'Flutter Demo',
-      theme: ThemeData(useMaterial3: true),
+      theme: ThemeData(
+          useMaterial3: true, colorSchemeSeed: const Color(0xff001748)),
       darkTheme: ThemeData.dark(),
       themeMode: ThemeMode.system,
-      home: const HomePage(),
+      home: const RootPage(),
+    );
+  }
+}
+
+class RootPage extends StatefulWidget {
+  const RootPage({Key? key}) : super(key: key);
+
+  @override
+  State<RootPage> createState() => _RootPageState();
+}
+
+class _RootPageState extends State<RootPage> {
+  int _selectedIndex = 0;
+
+  static const List<Widget> _pages = <Widget>[
+    HomePage(),
+    InfoPage(),
+    SettingsPage(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Flutter Demo Home Page'),
+      ),
+      body: Center(
+        child: _pages.elementAt(_selectedIndex),
+      ),
+      bottomNavigationBar: NavigationBar(
+        onDestinationSelected: _onItemTapped,
+        selectedIndex: _selectedIndex,
+        destinations: const <NavigationDestination>[
+          NavigationDestination(
+            icon: Icon(Icons.whatshot_outlined),
+            selectedIcon: Icon(Icons.whatshot),
+            label: 'Heat',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.info_outline),
+            selectedIcon: Icon(Icons.info),
+            label: 'Info',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
+      ),
     );
   }
 }
@@ -40,10 +126,37 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Hello World'),
-      ),
-    );
+    return ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+        child: ListView(
+          children: [
+            CurveCard(),
+            CurveCard(),
+            CurveCard(),
+            CurveCard(),
+            CurveCard(),
+            CurveCard(),
+            CurveCard(),
+            CurveCard(),
+          ],
+        ));
+  }
+}
+
+class InfoPage extends StatelessWidget {
+  const InfoPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(child: Text('Info Page'));
+  }
+}
+
+class SettingsPage extends StatelessWidget {
+  const SettingsPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(child: Text('Settings Page'));
   }
 }
