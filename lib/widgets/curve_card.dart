@@ -20,7 +20,7 @@ class CurveCard extends StatelessWidget {
           borderRadius: const BorderRadius.all(Radius.circular(12)),
         ),
         child: SizedBox(
-          width: 300,
+          // width: 300,
           height: 84,
           child: Container(
             padding: const EdgeInsets.all(16),

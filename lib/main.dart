@@ -3,6 +3,7 @@ import 'package:libserialport/libserialport.dart';
 import 'package:flutter_reflow/widgets/curve_card.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter_reflow/widgets/status_bar.dart';
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
   // Override behavior methods and getters like dragDevices
@@ -90,9 +91,7 @@ class _RootPageState extends State<RootPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Flutter Demo Home Page'),
-      ),
+      appBar: StatusBar(),
       body: Center(
         child: _pages.elementAt(_selectedIndex),
       ),
@@ -126,9 +125,12 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScrollConfiguration(
+    return Scaffold(
+      appBar: AppBar(title: const Text('Select Profile', style: TextStyle(fontSize: 40))),
+        body: ScrollConfiguration(
         behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
         child: ListView(
+          padding: const EdgeInsets.all(10),
           children: [
             CurveCard(),
             CurveCard(),
@@ -139,7 +141,7 @@ class HomePage extends StatelessWidget {
             CurveCard(),
             CurveCard(),
           ],
-        ));
+        )));
   }
 }
 
