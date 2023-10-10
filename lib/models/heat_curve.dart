@@ -1,3 +1,90 @@
+import 'dart:collection';
+import 'dart:math';
+
+class Point {
+  /// The temperature to reach at this point
+  final int temperature;
+
+  /// The duration from the start of the curve to this point
+  final Duration duration;
+
+  bool _isComplete = false;
+
+  Point(this.temperature, this.duration);
+
+  /// Whether the point has been completed.
+  bool get isComplete => _isComplete;
+
+  /// Mark the point as complete.
+  ///
+  /// This cannot be undone.
+  void complete() {
+    _isComplete = true;
+  }
+
+  /// Calculate the error for this point from an actual temperature and duration.
+  ///
+  /// The error is a double between 0 and 1, where 0 is no error and 1 is the
+  /// maximum error.
+  double calculateError(int actualTemperature, Duration actualDuration) {
+    // TODO can weight error to prefer temperature or time
+    double temperatureError = (temperature - actualTemperature).abs() / 100;
+    double timeError =
+        (duration - actualDuration).inMilliseconds / duration.inMilliseconds;
+
+    return temperatureError + timeError;
+  }
+}
+
+class Curve {
+  final List<Point> _points;
+
+  // empty iterator to start
+  Iterator<Point> _currentPoint = const Iterable<Point>.empty().iterator;
+  DateTime? _started;
+  DateTime? _finished;
+  bool _isFinished = false;
+
+  Curve(this._points) {
+    // check if points are ordered by duration to form a valid curve, throw error if not
+    for (var i = 0; i < _points.length - 1; i++) {
+      if (_points.elementAt(i).duration > _points.elementAt(i + 1).duration) {
+        throw ArgumentError('Points are not ordered by duration');
+      }
+    }
+  }
+
+  void start() {
+    _currentPoint = _points.iterator;
+    _started = DateTime.now();
+  }
+
+  DateTime? get started => _started;
+
+  Duration get duration => _points.last.duration;
+
+  Duration get finalDuration => _finished!.difference(_started!);
+
+  bool get isFinished => _isFinished;
+
+  UnmodifiableListView<Point> get points => UnmodifiableListView(_points);
+
+  /// Get the current point in the curve.
+  Point get currentPoint => _currentPoint.current;
+
+  /// Advance to the next point in the curve.
+  bool advance() {
+    _currentPoint.current.complete();
+    bool moveNext = _currentPoint.moveNext();
+    if (!moveNext) {
+      // TODO do any other completion tasks
+      _finished = DateTime.now();
+      _isFinished = true;
+    }
+    return moveNext;
+  }
+}
+
 class HeatCurve {
   // a curve for reflow oven soldering. Different temperatures need to be reached at different times
 

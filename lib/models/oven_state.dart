@@ -8,15 +8,15 @@ enum OvenState { idle, heating, cooling, error }
 enum OvenErrorType { none, tms, temperatureDifference }
 
 class OvenStatus {
-  final int currentTemperature;
-  final HeatCurve? currentCurve;
+  final int temperature;
+  final HeatCurve? curve;
 
   final OvenState state;
   final TmsStatus tmsStatus;
 
   OvenStatus(
-      {required this.currentTemperature,
+      {required this.temperature,
       required this.state,
       required this.tmsStatus,
-      this.currentCurve});
+      this.curve});
 }
