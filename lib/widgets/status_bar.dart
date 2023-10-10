@@ -26,7 +26,7 @@ class StatusBar extends StatelessWidget implements PreferredSizeWidget {
     return Material(
         // no elevation default :(
         elevation: appBarTheme.elevation ?? 0.0,
-        color: appBarTheme.backgroundColor,
+        color: Colors.black,
         shadowColor: appBarTheme.shadowColor,
         surfaceTintColor: appBarTheme.surfaceTintColor,
         shape: appBarTheme.shape,
@@ -52,13 +52,13 @@ class Temperature extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(children: [
       Icon(Icons.thermostat_outlined,
-          size: 24, color: Theme.of(context).colorScheme.onBackground),
+          size: 24, color: Colors.white),
       Text(
         '165°C',
         style: TextStyle(
             fontWeight: FontWeight.w400,
             fontSize: 16,
-            color: Theme.of(context).colorScheme.onBackground),
+            color: Colors.white),
         textAlign: TextAlign.center,
       ),
     ]);
