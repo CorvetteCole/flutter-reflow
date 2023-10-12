@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_reflow/models/reflow_profile.dart';
 
-class ReflowProfileProvider extends ChangeNotifier {
+class ReflowProfileList extends ChangeNotifier {
   final Set<ReflowProfile> _profiles;
   int? _selectedProfileIndex;
 
-  ReflowProfileProvider(this._profiles);
+  ReflowProfileList(this._profiles);
 
   UnmodifiableSetView<ReflowProfile> get profiles =>
       UnmodifiableSetView(_profiles);
