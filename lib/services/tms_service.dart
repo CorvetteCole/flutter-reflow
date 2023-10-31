@@ -76,6 +76,8 @@ class TmsService {
     }, onDone: () {
       // TODO need to somehow handle this reconnecting
       print('Done!');
+      _serialPortReader!.close();
+      _serialPort!.dispose();
     });
   }
 
