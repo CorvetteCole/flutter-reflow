@@ -53,11 +53,11 @@ class TmsStatus {
       this.state);
 
   TmsStatus.fromJson(Map<String, dynamic> json)
-      : targetTemperature = json['targetTemperature'],
-        currentTemperature = json['currentTemperature'],
-        topHeatDutyCycle = json['topHeatDutyCycle'],
-        bottomHeatDutyCycle = json['bottomHeatDutyCycle'],
-        isDoorOpen = json['isDoorOpen'],
+      : targetTemperature = json['target'],
+        currentTemperature = json['current'],
+        topHeatDutyCycle = json['top'],
+        bottomHeatDutyCycle = json['bottom'],
+        isDoorOpen = json['door_open'],
         _error = json['error'],
         state = TmsState.values.firstWhere((e) => e.name == json['state'],
             orElse: () => TmsState.unknown);

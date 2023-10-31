@@ -13,7 +13,7 @@ class TemperatureCommand implements TmsCommand {
 
   @override
   Map<String, dynamic> toJson() {
-    return {'targetTemperature': targetTemperature};
+    return {'target': targetTemperature};
   }
 }
 
@@ -24,7 +24,7 @@ class LogLevelCommand implements TmsCommand {
 
   @override
   Map<String, dynamic> toJson() {
-    return {'severity': severity.name};
+    return {'log': severity.name};
   }
 }
 
