@@ -4,6 +4,7 @@ import 'dart:ffi';
 import 'dart:typed_data';
 import 'package:flutter_reflow/models/tms_status.dart';
 import 'package:flutter_reflow/models/tms_log.dart';
+import 'package:flutter_reflow/models/tms_command.dart';
 
 import 'package:libserialport/libserialport.dart';
 
@@ -15,10 +16,12 @@ class TmsService {
   SerialPort? _serialPort;
   SerialPortReader? _serialPortReader;
 
-  final StreamController<TmsStatus> _statusStreamController = StreamController();
+  final StreamController<TmsStatus> _statusStreamController =
+      StreamController();
   final StreamController<TmsLog> _logStreamController = StreamController();
 
   Stream<TmsStatus> get statusStream => _statusStreamController.stream;
+
   Stream<TmsLog> get logStream => _logStreamController.stream;
 
   TmsService() {
@@ -81,10 +84,10 @@ class TmsService {
     });
   }
 
-  Future<int> send(String data) async {
+  Future<int> send(TmsCommand command) async {
     // TODO need to check if serial port is even valid
     // encode data to uint8list
-    Uint8List bytes = utf8.encode(data) as Uint8List;
+    Uint8List bytes = utf8.encode(jsonEncode(command.toJson())) as Uint8List;
     try {
       return _serialPort!.write(bytes, timeout: sendTimeout.inMilliseconds);
     } on SerialPortError catch (e) {
