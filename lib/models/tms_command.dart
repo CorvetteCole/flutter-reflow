@@ -1,20 +1,49 @@
 import 'package:flutter_reflow/models/tms_log.dart';
 
-class TmsCommand {
-  final int? targetTemperature;
-  final TmsLogSeverity? severity;
+abstract class TmsCommand {
 
-  TmsCommand({this.targetTemperature, this.severity});
+  Map<String, dynamic> toJson();
 
-  // toJson but don't include null values
+}
+
+class TemperatureCommand implements TmsCommand {
+  final int targetTemperature;
+
+  TemperatureCommand(this.targetTemperature);
+
+  @override
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{};
-    if (targetTemperature != null) {
-      json['targetTemperature'] = targetTemperature!;
-    }
-    if (severity != null) {
-      json['severity'] = severity!.name;
-    }
-    return json;
+    return {'targetTemperature': targetTemperature};
+  }
+}
+
+class LogLevelCommand implements TmsCommand {
+  final TmsLogSeverity severity;
+
+  LogLevelCommand(this.severity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {'severity': severity.name};
+  }
+}
+
+// pid command, ki, kp, kd, and either top or bottom heating element
+class PidCommand implements TmsCommand {
+  final double kp;
+  final double ki;
+  final double kd;
+  final bool top;
+
+  PidCommand(this.kp, this.ki, this.kd, this.top);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'kp': kp,
+      'ki': ki,
+      'kd': kd,
+      'top': top,
+    };
   }
 }
