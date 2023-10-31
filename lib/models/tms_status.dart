@@ -33,6 +33,16 @@ class TmsStatus {
 
   bool get hasErrors => _error != 0;
 
+  // want default constructor with "unknown" state
+  TmsStatus.unknown()
+      : targetTemperature = 0,
+        currentTemperature = 0,
+        topHeatDutyCycle = 0,
+        bottomHeatDutyCycle = 0,
+        isDoorOpen = false,
+        _error = 0,
+        state = TmsState.unknown;
+
   TmsStatus(
       this.targetTemperature,
       this.currentTemperature,
