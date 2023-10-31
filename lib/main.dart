@@ -15,8 +15,7 @@ import 'package:flutter_reflow/services/tms_service.dart';
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
   // Override behavior methods and getters like dragDevices
   @override
-  Set<PointerDeviceKind> get dragDevices =>
-      {
+  Set<PointerDeviceKind> get dragDevices => {
         PointerDeviceKind.touch,
         PointerDeviceKind.mouse,
         // etc.
@@ -61,24 +60,14 @@ void main() async {
   });
 
   final providers = [
-    StreamProvider<TmsStatus>.value(value: tmsService.statusStream,
-        initialData: TmsStatus.unknown(),
-        catchError: (context, error) {
-          // TODO: handle error
-          print('error: $error');
-          return TmsStatus.unknown();
-        })
-    ,
-    StreamProvider<TmsLog>.value(value: tmsService.logStream,
-        initialData: TmsLog.unknown(),
-        catchError: (context, error) {
-          print('error: $error');
-          return TmsLog.unknown();
-        }),
+    StreamProvider<TmsStatus>.value(
+        value: tmsService.statusStream, initialData: TmsStatus.unknown()),
+    StreamProvider<TmsLog>.value(
+        value: tmsService.logStream, initialData: TmsLog.unknown()),
   ];
 
   runApp(MultiProvider(providers: providers, child: const BasicApp()));
-  }
+}
 
 class BasicApp extends StatelessWidget {
   const BasicApp({Key? key}) : super(key: key);

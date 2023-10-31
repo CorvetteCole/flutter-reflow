@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:typed_data';
@@ -14,30 +15,11 @@ class TmsService {
   SerialPort? _serialPort;
   SerialPortReader? _serialPortReader;
 
-  // stream of tms status
-  Stream<TmsStatus> get statusStream async* {
-    // TODO make sure we don't need to do anything funky like combine chunks to make sure we get a full json object
-    await for (var data in _serialPortReader!.stream) {
-      // decode data to string
-      var json = jsonDecode(utf8.decode(data));
-      // check if json contains key 'severity'
-      if (json.containsKey('state')) {
-        yield TmsStatus.fromJson(json);
-      }
-    }
-  }
+  final StreamController<TmsStatus> _statusStreamController = StreamController();
+  final StreamController<TmsLog> _logStreamController = StreamController();
 
-  Stream<TmsLog> get logStream async* {
-    // TODO make sure we don't need to do anything funky like combine chunks to make sure we get a full json object
-    await for (var data in _serialPortReader!.stream) {
-      // decode data to string
-      var json = jsonDecode(utf8.decode(data));
-      // check if json contains key 'severity'
-      if (json.containsKey('severity')) {
-        yield TmsLog.fromJson(json);
-      }
-    }
-  }
+  Stream<TmsStatus> get statusStream => _statusStreamController.stream;
+  Stream<TmsLog> get logStream => _logStreamController.stream;
 
   TmsService() {
     connect();
@@ -77,6 +59,24 @@ class TmsService {
 
     _serialPortReader = SerialPortReader(_serialPort!);
     // _serialPortReader!.stream;
+
+    // listen for data on serial port, decode and add to respective stream
+    _serialPortReader!.stream.listen((data) {
+      // decode data to string
+      var json = jsonDecode(utf8.decode(data));
+      // check if json contains key 'severity'
+      if (json.containsKey('state')) {
+        _statusStreamController.add(TmsStatus.fromJson(json));
+      } else if (json.containsKey('severity')) {
+        _logStreamController.add(TmsLog.fromJson(json));
+      }
+    }, onError: (error) {
+      // TODO implement logging library
+      print('Error: $error');
+    }, onDone: () {
+      // TODO need to somehow handle this reconnecting
+      print('Done!');
+    });
   }
 
   Future<int> send(String data) async {
