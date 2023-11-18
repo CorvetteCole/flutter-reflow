@@ -13,7 +13,7 @@ class TmsLog {
         message = '';
 
   TmsLog.fromJson(Map<String, dynamic> json)
-      : time = Duration(microseconds: json['time']),
+      : time = Duration(milliseconds: json['time']),
         severity = TmsLogSeverity.values.firstWhere(
             (e) => e.name.toLowerCase() == json['severity'],
             orElse: () => TmsLogSeverity.unknown),

@@ -57,7 +57,7 @@ class TmsStatus {
         currentTemperature = json['current'],
         topHeatDutyCycle = json['top'],
         bottomHeatDutyCycle = json['bottom'],
-        isDoorOpen = json['door_open'],
+        isDoorOpen = json['door'] == "closed",
         _error = json['error'],
         state = TmsState.values.firstWhere((e) => e.name == json['state'],
             orElse: () => TmsState.unknown);
