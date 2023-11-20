@@ -19,7 +19,9 @@ class TmsService {
   SerialPort? _serialPort;
   SerialPortReader? _serialPortReader;
   bool _isReconnectScheduled = false;
-  DateTime _lastUpdated = DateTime.now();
+
+  // default to date time epoch so that it's stale immediately
+  DateTime _lastUpdated = DateTime.fromMillisecondsSinceEpoch(0);
 
   // chip 2, line 15
   final _tmsResetLine = FlutterGpiod.instance.chips[2].lines[15];
@@ -39,6 +41,7 @@ class TmsService {
 
   TmsService._() {
     _tmsResetLine.requestOutput(initialValue: true, consumer: 'flutter_reflow');
+    _connect();
     // on an interval, check the lastUpdated time and if it's stale, reset the TMS
     Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!healthy) {
@@ -46,7 +49,6 @@ class TmsService {
         reset();
       }
     });
-    _connect();
   }
 
   factory TmsService.connect() {
