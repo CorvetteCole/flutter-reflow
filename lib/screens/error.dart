@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_reflow/models/tms/tms_status.dart';
+import 'package:flutter_reflow/services/tms_service.dart';
 import 'package:provider/provider.dart';
 
 class ErrorScreen extends StatefulWidget {
@@ -17,12 +18,14 @@ class _ErrorScreenState extends State<ErrorScreen> {
       _isLoading = true;
     });
 
+    context.read<TmsService>().reset();
+
     // Simulate a network request after the button is pressed
-    Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        _isLoading = false;
-      });
-    });
+    // Future.delayed(Duration(seconds: 2), () {
+    //   setState(() {
+    //     _isLoading = false;
+    //   });
+    // });
   }
 
   @override

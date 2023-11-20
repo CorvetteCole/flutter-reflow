@@ -6,6 +6,7 @@ import 'package:flutter_reflow/models/tms/tms_status.dart';
 import 'package:flutter_reflow/models/tms/tms_log.dart';
 import 'package:flutter_reflow/models/tms/tms_command.dart';
 
+import 'package:flutter_gpiod/flutter_gpiod.dart';
 import 'package:libserialport/libserialport.dart';
 
 const sendTimeout = Duration(milliseconds: 100);
@@ -18,6 +19,9 @@ class TmsService {
   SerialPortReader? _serialPortReader;
   bool _isReconnectScheduled = false;
 
+  // chip 2, line 15
+  final _tmsResetLine = FlutterGpiod.instance.chips[2].lines[15];
+
   final StreamController<TmsStatus> _statusStreamController =
       StreamController.broadcast();
   final StreamController<TmsLog> _logStreamController =
@@ -28,6 +32,7 @@ class TmsService {
   Stream<TmsLog> get logStream => _logStreamController.stream;
 
   TmsService._() {
+    _tmsResetLine.requestOutput(initialValue: true, consumer: 'flutter_reflow');
     _connect();
   }
 
@@ -37,6 +42,7 @@ class TmsService {
   }
 
   void _connect() {
+    _tmsResetLine.setValue(true);
     try {
       log.info('Attempting to connect to a serial port...');
       if (SerialPort.availablePorts.isEmpty) {
@@ -164,6 +170,13 @@ class TmsService {
     }
   }
 
+  void reset() {
+    _tmsResetLine.setValue(false); // toggle GPIO
+    Future.delayed(const Duration(milliseconds: 100), () {
+      _tmsResetLine.setValue(true); // toggle GPIO
+    });
+  }
+
   void disconnect() {
     if (_serialPortReader != null) {
       log.fine('Closing serial port reader.');
@@ -181,5 +194,6 @@ class TmsService {
       serialPort.dispose();
       _serialPort = null;
     }
+    _tmsResetLine.release();
   }
 }

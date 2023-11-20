@@ -29,20 +29,22 @@ void main() async {
     debugPrint('${record.level.name}: ${record.time}: ${record.message}');
   });
 
-  print('Available ports:');
+  log.config('Available ports:');
   var i = 0;
   for (final name in SerialPort.availablePorts) {
     final sp = SerialPort(name);
-    print('${++i}) $name');
-    print('\tDescription: ${sp.description}');
-    print('\tManufacturer: ${sp.manufacturer}');
-    print('\tSerial Number: ${sp.serialNumber}');
-    print('\tProduct ID: 0x${sp.productId!.toRadixString(16)}');
-    print('\tVendor ID: 0x${sp.vendorId!.toRadixString(16)}');
+    log.config('${++i}) $name');
+    log.config('\tDescription: ${sp.description}');
+    log.config('\tManufacturer: ${sp.manufacturer}');
+    log.config('\tSerial Number: ${sp.serialNumber}');
+    log.config('\tProduct ID: 0x${sp.productId!.toRadixString(16)}');
+    log.config('\tVendor ID: 0x${sp.vendorId!.toRadixString(16)}');
     sp.dispose();
   }
 
-  TmsService tmsService = TmsService.connect();
+  final tmsService = TmsService.connect();
+
+  final tmsProvider = Provider<TmsService>.value(value: tmsService);
 
   try {
     WidgetsFlutterBinding.ensureInitialized();
@@ -65,6 +67,7 @@ void main() async {
   }
 
   final providers = [
+    tmsProvider,
     StreamProvider<TmsStatus>.value(
         value: tmsService.statusStream, initialData: TmsStatus.unknown()),
     StreamProvider<TmsLog>.value(
@@ -120,11 +123,12 @@ class _RootPageState extends State<RootPage> {
     return Scaffold(
         appBar: const StatusBar(),
         body: Center(
-          child: hasErrors ? const ErrorScreen() : _pages.elementAt(_selectedIndex),
+          child: hasErrors
+              ? const ErrorScreen()
+              : _pages.elementAt(_selectedIndex),
         ),
-        bottomNavigationBar:
-        hasErrors
-            ? Container(width: 0, height: 0)
+        bottomNavigationBar: hasErrors
+            ? const SizedBox(width: 0, height: 0)
             : NavigationBar(
                 onDestinationSelected: _onItemTapped,
                 selectedIndex: _selectedIndex,
