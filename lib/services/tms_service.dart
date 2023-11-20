@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:logging/logging.dart';
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_reflow/models/tms/tms_status.dart';
 import 'package:flutter_reflow/models/tms/tms_log.dart';
 import 'package:flutter_reflow/models/tms/tms_command.dart';
@@ -16,7 +17,7 @@ final log = Logger('TmsService');
 
 const Utf8Decoder utf8Decoder = Utf8Decoder(allowMalformed: true);
 
-class TmsService {
+class TmsService extends ChangeNotifier {
   SerialPort? _serialPort;
   SerialPortReader? _serialPortReader;
   bool _isReconnectScheduled = false;
@@ -28,9 +29,9 @@ class TmsService {
   final _tmsResetLine = FlutterGpiod.instance.chips[2].lines[15];
 
   final StreamController<TmsStatus> _statusStreamController =
-  StreamController.broadcast();
+      StreamController.broadcast();
   final StreamController<TmsLog> _logStreamController =
-  StreamController.broadcast();
+      StreamController.broadcast();
 
   Stream<TmsStatus> get statusStream => _statusStreamController.stream;
 
@@ -47,6 +48,7 @@ class TmsService {
     // on an interval, check the lastUpdated time and if it's stale, reset the TMS
     Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!healthy && DateTime.now().difference(lastReset) > tmsGracePeriod) {
+        notifyListeners();
         log.severe('TMS is stale. Resetting...');
         lastReset = DateTime.now();
         reset();
@@ -105,7 +107,7 @@ class TmsService {
     serialPort.config = config;
     log.config(
         'Serial port configured with baudRate: ${config.baudRate}, bits: ${config.bits}, stopBits: ${config.stopBits}, parity: ${config.parity}');
-    }
+  }
 
   void _startListening() {
     final serialPort = _serialPort;
@@ -121,7 +123,7 @@ class TmsService {
         .bind(_serialPortReader!.stream)
         .transform(const LineSplitter())
         .listen(
-          (line) {
+      (line) {
         _processSerialData(line);
       },
       onError: (error) {
@@ -138,6 +140,9 @@ class TmsService {
 
   void _processSerialData(String line) {
     _lastUpdated = DateTime.now();
+    if (!healthy) {
+      notifyListeners();
+    }
     log.finer('Received line: $line');
     try {
       var json = jsonDecode(line);
@@ -179,7 +184,7 @@ class TmsService {
     }
 
     Uint8List bytes =
-    Uint8List.fromList(utf8.encode(jsonEncode(command.toJson())));
+        Uint8List.fromList(utf8.encode(jsonEncode(command.toJson())));
     log.fine('Sending command to the device.');
     try {
       return serialPort.write(bytes, timeout: sendTimeout.inMilliseconds);
