@@ -58,13 +58,9 @@ class _ErrorScreenState extends State<ErrorScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
               Expanded(
                 child: Container(),
               ),
-              const Text('Press the button below to acknowledge',
-                  style: TextStyle(
-                      color: Colors.black, fontWeight: FontWeight.bold)),
               const SizedBox(height: 20),
               FilledButton.icon(
                   onPressed: _reset,

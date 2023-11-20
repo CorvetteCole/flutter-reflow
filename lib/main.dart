@@ -44,9 +44,6 @@ void main() async {
 
   final tmsService = TmsService.connect();
 
-  final tmsProvider =
-      ChangeNotifierProvider<TmsService>.value(value: tmsService);
-
   try {
     WidgetsFlutterBinding.ensureInitialized();
     // Must add this line.
@@ -68,7 +65,7 @@ void main() async {
   }
 
   final providers = [
-    tmsProvider,
+    ChangeNotifierProvider<TmsService>.value(value: tmsService),
     StreamProvider<TmsStatus>.value(
         value: tmsService.statusStream, initialData: TmsStatus.unknown()),
     StreamProvider<TmsLog>.value(
