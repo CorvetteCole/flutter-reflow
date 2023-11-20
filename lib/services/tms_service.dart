@@ -10,6 +10,7 @@ import 'package:flutter_gpiod/flutter_gpiod.dart';
 import 'package:libserialport/libserialport.dart';
 
 const sendTimeout = Duration(milliseconds: 100);
+const tmsStaleTimeout = Duration(seconds: 2);
 final log = Logger('TmsService');
 
 const Utf8Decoder utf8Decoder = Utf8Decoder(allowMalformed: true);
@@ -18,6 +19,7 @@ class TmsService {
   SerialPort? _serialPort;
   SerialPortReader? _serialPortReader;
   bool _isReconnectScheduled = false;
+  DateTime _lastUpdated = DateTime.now();
 
   // chip 2, line 15
   final _tmsResetLine = FlutterGpiod.instance.chips[2].lines[15];
@@ -31,8 +33,17 @@ class TmsService {
 
   Stream<TmsLog> get logStream => _logStreamController.stream;
 
+  DateTime get lastUpdated => _lastUpdated;
+
   TmsService._() {
     _tmsResetLine.requestOutput(initialValue: true, consumer: 'flutter_reflow');
+    // on an interval, check the lastUpdated time and if it's stale, reset the TMS
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (DateTime.now().difference(_lastUpdated) > tmsStaleTimeout) {
+        log.severe('TMS is stale. Resetting...');
+        reset();
+      }
+    });
     _connect();
   }
 
@@ -119,6 +130,7 @@ class TmsService {
   }
 
   void _processSerialData(String line) {
+    _lastUpdated = DateTime.now();
     log.finer('Received line: $line');
     try {
       var json = jsonDecode(line);
@@ -144,7 +156,7 @@ class TmsService {
 
     disconnect();
     _isReconnectScheduled = true;
-    final delay = Duration(seconds: 1);
+    const delay = Duration(seconds: 1);
     log.info('Scheduling reconnect in ${delay.inSeconds} second(s)...');
     Future.delayed(delay, () {
       _isReconnectScheduled = false;

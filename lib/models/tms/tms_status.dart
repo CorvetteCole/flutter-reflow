@@ -18,7 +18,6 @@ enum TmsError {
 }
 
 class TmsStatus {
-  final DateTime lastUpdated = DateTime.now();
   final num targetTemperature;
   final num currentTemperature;
   final int topHeatDutyCycle;
@@ -64,6 +63,6 @@ class TmsStatus {
 
   @override
   String toString() {
-    return 'lastUpdated: $lastUpdated, targetTemperature: $targetTemperature, currentTemperature: $currentTemperature, topHeatDutyCycle: $topHeatDutyCycle, bottomHeatDutyCycle: $bottomHeatDutyCycle, state: $state, _error: $_error, isDoorOpen: $isDoorOpen';
+    return 'targetTemperature: $targetTemperature, currentTemperature: $currentTemperature, topHeatDutyCycle: $topHeatDutyCycle, bottomHeatDutyCycle: $bottomHeatDutyCycle, state: $state, _error: $_error, isDoorOpen: $isDoorOpen';
   }
 }
