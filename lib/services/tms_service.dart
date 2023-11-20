@@ -264,7 +264,9 @@ class TmsService extends ChangeNotifier {
           milliseconds:
               timer.tick * 500)); // get temperature for current profile time
       log.finest('Sending target temperature to TMS: $temperature');
-      send(TemperatureCommand(temperature));
+      // send(TemperatureCommand(temperature));
+      _targetTemperature = temperature;
+      notifyListeners();
     });
   }
 
