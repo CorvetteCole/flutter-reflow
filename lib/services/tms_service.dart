@@ -24,6 +24,7 @@ class TmsService extends ChangeNotifier {
   bool _isReconnectScheduled = false;
   bool _isConnected = false;
   Timer? _profileTimer;
+  double _profileProgress = 0.0;
   int _targetTemperature = 0;
 
   // default to date time epoch so that it's stale immediately
@@ -48,6 +49,8 @@ class TmsService extends ChangeNotifier {
   bool get isConnected => _isConnected;
 
   bool get isProfileRunning => _profileTimer != null && _profileTimer!.isActive;
+
+  double get profileProgress => _profileProgress;
 
   set targetTemperature(int value) {
     _targetTemperature = value;
@@ -266,18 +269,20 @@ class TmsService extends ChangeNotifier {
 
       startTime ??= DateTime.now();
 
-      if (profile.duration.inMilliseconds < timer.tick * 500) {
+      if (profile.duration < startTime!.difference(DateTime.now())) {
         log.info('Profile complete.');
         timer.cancel();
         _profileTimer = null;
+        _profileProgress = 0.0;
         return;
       }
-      final temperature = profile.getTemperature(Duration(
-          milliseconds:
-              timer.tick * 500)); // get temperature for current profile time
+      final temperature = profile.getTemperature(startTime!.difference(
+          DateTime.now())); // get temperature for current profile time
       log.finest('Sending target temperature to TMS: $temperature');
       // send(TemperatureCommand(temperature));
       _targetTemperature = temperature;
+      _profileProgress = startTime!.difference(DateTime.now()).inSeconds /
+          profile.duration.inSeconds;
       notifyListeners();
     });
   }

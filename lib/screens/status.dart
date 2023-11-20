@@ -44,12 +44,9 @@ class _StatusPageState extends State<StatusPage> {
                   Text('Caution: Do not open the door',
                       style: TextStyle(fontSize: 16)),
                   SizedBox(height: 10),
-                  LinearProgressIndicator(
-                    value: startTime != null
-                        ? startTime!.difference(DateTime.now()).inSeconds /
-                            widget.profile.duration.inSeconds
-                        : 0,
-                  ),
+                  Consumer(builder: (context, TmsService service, child) {
+                    return LinearProgressIndicator(value: service.profileProgress);
+                  }),
                   SizedBox(height: 10),
                   FilledButton(
                       onPressed: () => {
