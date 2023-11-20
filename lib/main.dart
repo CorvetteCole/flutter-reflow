@@ -5,7 +5,7 @@ import 'package:flutter_reflow/models/tms/tms_status.dart';
 import 'package:flutter_reflow/screens/diagnostic.dart';
 import 'package:libserialport/libserialport.dart';
 import 'package:flutter_reflow/screens/curve_select.dart';
-import 'package:flutter_reflow/screens/info.dart';
+import 'package:flutter_reflow/screens/error.dart';
 import 'package:flutter_reflow/screens/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
@@ -115,32 +115,36 @@ class _RootPageState extends State<RootPage> {
 
   @override
   Widget build(BuildContext context) {
+    final hasErrors = context.select((TmsStatus status) => status.hasErrors);
+
     return Scaffold(
-      appBar: const StatusBar(),
-      body: Center(
-        child: _pages.elementAt(_selectedIndex),
-      ),
-      bottomNavigationBar: NavigationBar(
-        onDestinationSelected: _onItemTapped,
-        selectedIndex: _selectedIndex,
-        destinations: const <NavigationDestination>[
-          NavigationDestination(
-            icon: Icon(Icons.whatshot_outlined),
-            selectedIcon: Icon(Icons.whatshot),
-            label: 'Heat',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.info_outline),
-            selectedIcon: Icon(Icons.info),
-            label: 'Info',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-      ),
-    );
+        appBar: const StatusBar(),
+        body: Center(
+          child: hasErrors ? const ErrorScreen() : _pages.elementAt(_selectedIndex),
+        ),
+        bottomNavigationBar:
+        hasErrors
+            ? Container(width: 0, height: 0)
+            : NavigationBar(
+                onDestinationSelected: _onItemTapped,
+                selectedIndex: _selectedIndex,
+                destinations: const <NavigationDestination>[
+                  NavigationDestination(
+                    icon: Icon(Icons.whatshot_outlined),
+                    selectedIcon: Icon(Icons.whatshot),
+                    label: 'Heat',
+                  ),
+                  NavigationDestination(
+                    icon: Icon(Icons.info_outline),
+                    selectedIcon: Icon(Icons.info),
+                    label: 'Info',
+                  ),
+                  NavigationDestination(
+                    icon: Icon(Icons.settings_outlined),
+                    selectedIcon: Icon(Icons.settings),
+                    label: 'Settings',
+                  ),
+                ],
+              ));
   }
 }
