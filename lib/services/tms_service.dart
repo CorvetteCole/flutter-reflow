@@ -21,6 +21,7 @@ class TmsService extends ChangeNotifier {
   SerialPort? _serialPort;
   SerialPortReader? _serialPortReader;
   bool _isReconnectScheduled = false;
+  bool _isConnected = false;
 
   // default to date time epoch so that it's stale immediately
   DateTime _lastUpdated = DateTime.fromMillisecondsSinceEpoch(0);
@@ -41,6 +42,8 @@ class TmsService extends ChangeNotifier {
 
   bool get healthy => DateTime.now().difference(_lastUpdated) < tmsStaleTimeout;
 
+  bool get isConnected => _isConnected;
+
   TmsService._() {
     _tmsResetLine.requestOutput(initialValue: true, consumer: 'flutter_reflow');
     _connect();
@@ -48,7 +51,6 @@ class TmsService extends ChangeNotifier {
     // on an interval, check the lastUpdated time and if it's stale, reset the TMS
     Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!healthy && DateTime.now().difference(lastReset) > tmsGracePeriod) {
-        notifyListeners();
         log.severe('TMS is stale. Resetting...');
         lastReset = DateTime.now();
         reset();
@@ -133,14 +135,14 @@ class TmsService extends ChangeNotifier {
       },
       onDone: () {
         log.info('Serial port reader was closed.');
-        _scheduleReconnect();
       },
     );
   }
 
   void _processSerialData(String line) {
     _lastUpdated = DateTime.now();
-    if (!healthy) {
+    if (!_isConnected) {
+      _isConnected = true;
       notifyListeners();
     }
     log.finer('Received line: $line');
@@ -165,7 +167,6 @@ class TmsService extends ChangeNotifier {
       log.fine('Reconnect is already scheduled. Ignoring this request.');
       return;
     }
-
     disconnect();
     _isReconnectScheduled = true;
     const delay = Duration(seconds: 1);
@@ -202,6 +203,8 @@ class TmsService extends ChangeNotifier {
   }
 
   void disconnect() {
+    _isConnected = false;
+    notifyListeners();
     if (_serialPortReader != null) {
       log.fine('Closing serial port reader.');
       _serialPortReader!.close();

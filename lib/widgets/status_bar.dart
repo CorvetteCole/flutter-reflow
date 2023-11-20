@@ -89,9 +89,14 @@ class ConnectionStatus extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final healthy = context.watch<TmsService>().healthy;
-    return Icon(Icons.monitor_heart_outlined,
-        size: 24,
-        color: healthy ? Colors.green : Theme.of(context).colorScheme.error);
+    return Consumer<TmsService>(builder: (context, TmsService service, child) {
+      return Row(children: [
+        Icon(Icons.monitor_heart_outlined,
+            size: 24,
+            color: service.isConnected
+                ? Colors.green
+                : Theme.of(context).colorScheme.error)
+      ]);
+    });
   }
 }
