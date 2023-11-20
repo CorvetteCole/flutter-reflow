@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 
@@ -32,16 +33,23 @@ class ReflowProfile extends ChangeNotifier {
 
   int getTemperature(int seconds) {
     // find the two points that the current duration falls between
-    final firstPoint = _points.firstWhere((element) => element.time.inSeconds >= seconds);
-    final secondPoint = _points.firstWhere((element) => element.time.inSeconds > seconds);
+    final firstPoint =
+        _points.firstWhere((element) => element.time.inSeconds >= seconds);
+    final secondPoint =
+        _points.firstWhere((element) => element.time.inSeconds > seconds);
     // interpolate between the two points
     final firstPointSeconds = firstPoint.time.inSeconds;
     final secondPointSeconds = secondPoint.time.inSeconds;
     final firstPointTemperature = firstPoint.temperature;
     final secondPointTemperature = secondPoint.temperature;
-    final slope = (secondPointTemperature - firstPointTemperature) / (secondPointSeconds - firstPointSeconds);
-    final temperature = firstPointTemperature + slope * (seconds - firstPointSeconds);
-    return temperature.round();
+    final slope = (secondPointTemperature - firstPointTemperature) /
+        (secondPointSeconds - firstPointSeconds);
+    final temperature =
+        firstPointTemperature + slope * (seconds - firstPointSeconds);
+    // clamp the temperature to the range of the two points
+    return temperature.round().clamp(
+        min(firstPointTemperature, secondPointTemperature),
+        max(firstPointTemperature, secondPointTemperature));
   }
 
   int get highestTemperature => _points

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter_reflow/models/reflow_profile.dart';
 import 'package:logging/logging.dart';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
@@ -22,6 +23,7 @@ class TmsService extends ChangeNotifier {
   SerialPortReader? _serialPortReader;
   bool _isReconnectScheduled = false;
   bool _isConnected = false;
+  Timer? _profileTimer;
   int _targetTemperature = 0;
 
   // default to date time epoch so that it's stale immediately
@@ -44,6 +46,8 @@ class TmsService extends ChangeNotifier {
   bool get healthy => DateTime.now().difference(_lastUpdated) < tmsStaleTimeout;
 
   bool get isConnected => _isConnected;
+
+  bool get isProfileRunning => _profileTimer != null && _profileTimer!.isActive;
 
   set targetTemperature(int value) {
     _targetTemperature = value;
@@ -240,6 +244,32 @@ class TmsService extends ChangeNotifier {
       log.info('Disposing serial port.');
       serialPort.dispose();
       _serialPort = null;
+    }
+  }
+
+  void runProfile(ReflowProfile profile) {
+    if (isProfileRunning) {
+      log.warning('Attempted to run a profile while one is already running.');
+      return;
+    }
+    log.info('Running profile: ${profile.name}');
+    _profileTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      if (profile.duration.inMilliseconds < timer.tick * 500) {
+        log.info('Profile complete.');
+        timer.cancel();
+        _profileTimer = null;
+        return;
+      }
+      final temperature = profile.getTemperature(timer.tick * 500);
+      log.finest('Sending target temperature to TMS: $temperature');
+      send(TemperatureCommand(temperature));
+    });
+  }
+
+  void stopProfile() {
+    if (isProfileRunning) {
+      _profileTimer?.cancel();
+      send(TemperatureCommand(0));
     }
   }
 }

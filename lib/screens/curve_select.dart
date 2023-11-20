@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_reflow/models/reflow_profile.dart';
 import 'package:flutter_reflow/screens/status.dart';
+import 'package:flutter_reflow/services/tms_service.dart';
 import 'package:flutter_reflow/widgets/curve_card.dart';
+import 'package:provider/provider.dart';
 
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -116,10 +118,14 @@ class CurveDetailsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     FilledButton(
-                        onPressed: () => Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => StatusPage(profile))),
+                        onPressed: () => {
+                              context.read<TmsService>().runProfile(profile),
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          StatusPage(profile)))
+                            },
                         style: FilledButton.styleFrom(
                           // foregroundColor: Colors.white,
                           // backgroundColor: Theme.of(context).colorScheme.primary,
