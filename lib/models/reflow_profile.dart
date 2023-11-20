@@ -41,9 +41,14 @@ class ReflowProfile extends ChangeNotifier {
     if (currentTime > _points.last.time) {
       return _points.last.temperature;
     }
-    // find the two points that currentTime is between
-    final lowerPoint = _points.lastWhere((element) => element.time < currentTime);
-    final upperPoint = _points.firstWhere((element) => element.time > currentTime);
+    // find the two points that currentTime is between, catching case where they don't exist
+    final lowerPoint = _points.firstWhere(
+        (element) => element.time < currentTime,
+        orElse: () => _points.first);
+    final upperPoint = _points.lastWhere(
+        (element) => element.time > currentTime,
+        orElse: () => _points.last);
+
     // calculate the slope between the two points
     final slope = (upperPoint.temperature - lowerPoint.temperature) /
         (upperPoint.time - lowerPoint.time).inSeconds;

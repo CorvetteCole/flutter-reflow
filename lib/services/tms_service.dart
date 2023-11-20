@@ -247,13 +247,25 @@ class TmsService extends ChangeNotifier {
     }
   }
 
-  void runProfile(ReflowProfile profile) {
+  void runProfile(ReflowProfile profile) async {
     if (isProfileRunning) {
       log.warning('Attempted to run a profile while one is already running.');
       return;
     }
     log.info('Running profile: ${profile.name}');
-    _profileTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+    DateTime? startTime;
+    var tmsStatus = await statusStream.first;
+    _targetTemperature = 35;
+    _profileTimer =
+        Timer.periodic(const Duration(milliseconds: 500), (timer) async {
+      tmsStatus = await statusStream.first;
+      if (tmsStatus.currentTemperature < 35.0) {
+        log.info('Waiting for TMS to heat up...');
+        return;
+      }
+
+      startTime ??= DateTime.now();
+
       if (profile.duration.inMilliseconds < timer.tick * 500) {
         log.info('Profile complete.');
         timer.cancel();
