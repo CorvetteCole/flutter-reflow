@@ -35,11 +35,13 @@ class TmsService {
 
   DateTime get lastUpdated => _lastUpdated;
 
+  bool get healthy => DateTime.now().difference(_lastUpdated) < tmsStaleTimeout;
+
   TmsService._() {
     _tmsResetLine.requestOutput(initialValue: true, consumer: 'flutter_reflow');
     // on an interval, check the lastUpdated time and if it's stale, reset the TMS
     Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (DateTime.now().difference(_lastUpdated) > tmsStaleTimeout) {
+      if (!healthy) {
         log.severe('TMS is stale. Resetting...');
         reset();
       }

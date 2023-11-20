@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_reflow/models/tms/tms_status.dart';
+import 'package:flutter_reflow/services/tms_service.dart';
 import 'package:provider/provider.dart';
 
 /// The preferred height of the status bar
@@ -37,9 +38,11 @@ class StatusBar extends StatelessWidget implements PreferredSizeWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Consumer<TmsStatus>(builder: (context, TmsStatus status, _) {
-                  return Temperature(status.currentTemperature);
-                }),
+                Selector<TmsStatus, num>(
+                    selector: (context, status) => status.currentTemperature,
+                    builder: (context, num currentTemperature, child) {
+                      return Temperature(currentTemperature);
+                    }),
                 const ConnectionStatus(),
               ],
             )));
@@ -86,7 +89,10 @@ class ConnectionStatus extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Icon(Icons.monitor_heart_outlined,
-        size: 24, color: Colors.green);
+    final bool healthy =
+        context.select<TmsService, bool>((tmsService) => tmsService.healthy);
+    return Icon(Icons.monitor_heart_outlined,
+        size: 24,
+        color: healthy ? Colors.green : Theme.of(context).colorScheme.error);
   }
 }
