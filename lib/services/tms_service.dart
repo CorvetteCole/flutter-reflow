@@ -22,6 +22,7 @@ class TmsService extends ChangeNotifier {
   SerialPortReader? _serialPortReader;
   bool _isReconnectScheduled = false;
   bool _isConnected = false;
+  int _targetTemperature = 0;
 
   // default to date time epoch so that it's stale immediately
   DateTime _lastUpdated = DateTime.fromMillisecondsSinceEpoch(0);
@@ -44,6 +45,13 @@ class TmsService extends ChangeNotifier {
 
   bool get isConnected => _isConnected;
 
+  set targetTemperature(int value) {
+    _targetTemperature = value;
+    notifyListeners();
+  }
+
+  int get targetTemperature => _targetTemperature;
+
   TmsService._() {
     _tmsResetLine.requestOutput(initialValue: true, consumer: 'flutter_reflow');
     _connect();
@@ -54,6 +62,13 @@ class TmsService extends ChangeNotifier {
         log.severe('TMS is stale. Resetting...');
         lastReset = DateTime.now();
         reset();
+      }
+    });
+    // send target temperature every 500ms
+    Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      if (_serialPort != null && _serialPort!.isOpen) {
+        log.finest('Sending target temperature to TMS: $_targetTemperature');
+        send(TemperatureCommand(_targetTemperature));
       }
     });
   }
