@@ -43,7 +43,11 @@ class StatusBar extends StatelessWidget implements PreferredSizeWidget {
                     builder: (context, num currentTemperature, child) {
                       return Temperature(currentTemperature);
                     }),
-                const ConnectionStatus(),
+                Selector<TmsService, bool>(
+                    selector: (context, tmsService) => tmsService.healthy,
+                    builder: (context, bool healthy, child) {
+                      return ConnectionStatus(healthy);
+                    })
               ],
             )));
   }
@@ -85,14 +89,14 @@ class Temperature extends StatelessWidget {
 
 /// Widget that displays the websocket connection status in a friendly manner
 class ConnectionStatus extends StatelessWidget {
-  const ConnectionStatus({Key? key}) : super(key: key);
+  final bool _healthy;
+
+  const ConnectionStatus(this._healthy, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final bool healthy =
-        context.select<TmsService, bool>((tmsService) => tmsService.healthy);
     return Icon(Icons.monitor_heart_outlined,
         size: 24,
-        color: healthy ? Colors.green : Theme.of(context).colorScheme.error);
+        color: _healthy ? Colors.green : Theme.of(context).colorScheme.error);
   }
 }
