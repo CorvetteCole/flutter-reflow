@@ -104,10 +104,7 @@ class TmsService {
     config.parity = SerialPortParity.none;
     serialPort.config = config;
     log.config(
-        'Serial port configured with baudRate: ${config.baudRate}, b
-
-
-        its: ${config.bits}, stopBits: ${config.stopBits}, parity: ${config.parity}');
+        'Serial port configured with baudRate: ${config.baudRate}, bits: ${config.bits}, stopBits: ${config.stopBits}, parity: ${config.parity}');
     }
 
   void _startListening() {
