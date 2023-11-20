@@ -32,28 +32,25 @@ class ReflowProfile extends ChangeNotifier {
   Duration get duration => _points.last.time;
 
   int getTemperature(Duration currentTime) {
-// if the current time is before the first point, return the first point's temperature
+    // extrapolate temperature between points
+    // if currentTime is before the first point, return the first point's temperature
     if (currentTime < _points.first.time) {
       return _points.first.temperature;
     }
-    // if the current time is after the last point, return the last point's temperature
+    // if currentTime is after the last point, return the last point's temperature
     if (currentTime > _points.last.time) {
       return _points.last.temperature;
     }
-    // otherwise, find the two points that the current time is between and interpolate
-    for (var i = 0; i < _points.length - 1; i++) {
-      if (_points.elementAt(i).time <= currentTime &&
-          _points.elementAt(i + 1).time >= currentTime) {
-        final x1 = _points.elementAt(i).time.inSeconds;
-        final x2 = _points.elementAt(i + 1).time.inSeconds;
-        final y1 = _points.elementAt(i).temperature;
-        final y2 = _points.elementAt(i + 1).temperature;
-        final x = currentTime.inSeconds;
-        final y = ((y2 - y1) / (x2 - x1)) * (x - x1) + y1;
-        return y.round();
-      }
-    }
-    throw StateError('Could not find temperature for time $currentTime');
+    // find the two points that currentTime is between
+    final lowerPoint = _points.lastWhere((element) => element.time < currentTime);
+    final upperPoint = _points.firstWhere((element) => element.time > currentTime);
+    // calculate the slope between the two points
+    final slope = (upperPoint.temperature - lowerPoint.temperature) /
+        (upperPoint.time - lowerPoint.time).inSeconds;
+    // calculate the temperature at currentTime
+    final temperature = slope * (currentTime - lowerPoint.time).inSeconds +
+        lowerPoint.temperature;
+    return temperature.round();
   }
 
   int get highestTemperature => _points
