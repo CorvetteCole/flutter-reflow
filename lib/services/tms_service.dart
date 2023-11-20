@@ -278,7 +278,8 @@ class TmsService extends ChangeNotifier {
       }
       final temperature = profile.getTemperature(startTime!.difference(
           DateTime.now())); // get temperature for current profile time
-      log.finest('Sending target temperature to TMS: $temperature');
+      log.finest(
+          'Calculated profile temperature: $temperature for time: ${startTime!.difference(DateTime.now())}, remaining: ${profile.duration - startTime!.difference(DateTime.now())}');
       // send(TemperatureCommand(temperature));
       _targetTemperature = temperature;
       _profileProgress = startTime!.difference(DateTime.now()).inSeconds /
