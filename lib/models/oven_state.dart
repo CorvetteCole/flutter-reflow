@@ -18,7 +18,7 @@ class OvenStatus {
       required this.tmsStatus,
       this.curve});
 
-  int get currentTemperature => tmsStatus.currentTemperature;
-  int get targetTemperature => curve?.targetTemperature ?? tmsStatus.targetTemperature;
+  num get currentTemperature => tmsStatus.currentTemperature;
+  num get targetTemperature => curve?.targetTemperature ?? tmsStatus.targetTemperature;
 
 }

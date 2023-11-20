@@ -18,4 +18,9 @@ class TmsLog {
             (e) => e.name.toLowerCase() == json['severity'],
             orElse: () => TmsLogSeverity.unknown),
         message = json['message'];
+
+  @override
+  String toString() {
+    return 'TmsLog{time: $time, severity: $severity, message: $message}';
+  }
 }

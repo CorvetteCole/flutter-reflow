@@ -19,8 +19,8 @@ enum TmsError {
 
 class TmsStatus {
   final DateTime lastUpdated = DateTime.now();
-  final int targetTemperature;
-  final int currentTemperature;
+  final num targetTemperature;
+  final num currentTemperature;
   final int topHeatDutyCycle;
   final int bottomHeatDutyCycle;
   final TmsState state;
@@ -57,8 +57,13 @@ class TmsStatus {
         currentTemperature = json['current'],
         topHeatDutyCycle = json['top'],
         bottomHeatDutyCycle = json['bottom'],
-        isDoorOpen = json['door'] == "closed",
+        isDoorOpen = json['door'] == "open",
         _error = json['error'],
         state = TmsState.values.firstWhere((e) => e.name == json['state'],
             orElse: () => TmsState.unknown);
+
+  @override
+  String toString() {
+    return 'lastUpdated: $lastUpdated, targetTemperature: $targetTemperature, currentTemperature: $currentTemperature, topHeatDutyCycle: $topHeatDutyCycle, bottomHeatDutyCycle: $bottomHeatDutyCycle, state: $state, _error: $_error, isDoorOpen: $isDoorOpen';
+  }
 }
