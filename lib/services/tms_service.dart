@@ -193,6 +193,10 @@ class TmsService extends ChangeNotifier {
   }
 
   Future<int> send(TmsCommand command) async {
+    if (TmsCommand is TemperatureCommand) {
+      targetTemperature = (command as TemperatureCommand).targetTemperature;
+    }
+
     final serialPort = _serialPort;
     if (serialPort == null || !serialPort.isOpen) {
       log.warning('Serial port is either null or not open.');
@@ -219,6 +223,7 @@ class TmsService extends ChangeNotifier {
 
   void disconnect() {
     _isConnected = false;
+    targetTemperature = 0; // reset to 0 on disconnect
     notifyListeners();
     if (_serialPortReader != null) {
       log.fine('Closing serial port reader.');
