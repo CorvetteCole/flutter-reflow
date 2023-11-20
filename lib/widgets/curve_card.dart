@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_reflow/models/heat_curve.dart';
+import 'package:flutter_reflow/models/reflow_profile.dart';
 
 class CurveCard extends StatelessWidget {
   // final HeatCurve2 curve;
+  final ReflowProfile profile;
 
-  const CurveCard({Key? key /*, required this.curve*/
-      })
-      : super(key: key);
+  const CurveCard(this.profile, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,26 +30,26 @@ class CurveCard extends StatelessWidget {
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
-                      'Unleaded',
+                      profile.name,
                       style:
-                          TextStyle(fontWeight: FontWeight.w400, fontSize: 22),
+                          const TextStyle(fontWeight: FontWeight.w400, fontSize: 22),
                     ),
-                    Text('Chip Quik© TS391LT',
-                        style: TextStyle(
+                    Text('${profile.manufacturer} ${profile.model}',
+                        style: const TextStyle(
                             fontWeight: FontWeight.w400, fontSize: 14)),
                   ],
                 ),
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.end,
-                  children: const [
-                    Text('165°C',
-                        style: TextStyle(
+                  children: [
+                    Text('${profile.highestTemperature}°C',
+                        style: const TextStyle(
                             fontWeight: FontWeight.w400, fontSize: 14)),
-                    Text('270 seconds',
-                        style: TextStyle(
+                    Text('${profile.duration.inSeconds} seconds',
+                        style: const TextStyle(
                             fontWeight: FontWeight.w400, fontSize: 14)),
                   ],
                 ),

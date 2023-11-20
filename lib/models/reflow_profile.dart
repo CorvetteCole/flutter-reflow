@@ -59,8 +59,9 @@ class ReflowProfile extends ChangeNotifier {
       : name = json['name'],
         model = json['model'],
         manufacturer = json['manufacturer'],
-        _points = (json['points'] as List<List<int>>)
-            .map((e) => ReflowProfilePoint(Duration(seconds: e[0]), e[1]))
+        _points = (json['points'] as List<dynamic>)
+            .map((e) =>
+                ReflowProfilePoint(Duration(seconds: e[0] as int), e[1] as int))
             .toList();
 
   Map<String, dynamic> toJson() => {
