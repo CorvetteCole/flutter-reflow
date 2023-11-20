@@ -269,11 +269,12 @@ class TmsService extends ChangeNotifier {
 
       startTime ??= DateTime.now();
 
-      if (profile.duration < startTime!.difference(DateTime.now())) {
+      if (profile.duration < DateTime.now().difference(startTime!)) {
         log.info('Profile complete.');
         timer.cancel();
         _profileTimer = null;
         _profileProgress = 0.0;
+        _targetTemperature = 0;
         return;
       }
       final temperature = profile.getTemperature(DateTime.now()
