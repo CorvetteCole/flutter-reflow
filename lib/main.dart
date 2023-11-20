@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_reflow/models/tms_log.dart';
 import 'package:flutter_reflow/models/tms_status.dart';
+import 'package:flutter_reflow/screens/diagnostic.dart';
 import 'package:libserialport/libserialport.dart';
 import 'package:flutter_reflow/screens/curve_select.dart';
 import 'package:flutter_reflow/screens/info.dart';
@@ -102,7 +103,7 @@ class _RootPageState extends State<RootPage> {
 
   static const List<Widget> _pages = <Widget>[
     CurveSelectPage(),
-    InfoPage(),
+    DiagnosticsPage(),
     SettingsPage(),
   ];
 
