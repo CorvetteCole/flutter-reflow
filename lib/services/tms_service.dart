@@ -28,9 +28,9 @@ class TmsService {
   final _tmsResetLine = FlutterGpiod.instance.chips[2].lines[15];
 
   final StreamController<TmsStatus> _statusStreamController =
-      StreamController.broadcast();
+  StreamController.broadcast();
   final StreamController<TmsLog> _logStreamController =
-      StreamController.broadcast();
+  StreamController.broadcast();
 
   Stream<TmsStatus> get statusStream => _statusStreamController.stream;
 
@@ -48,6 +48,7 @@ class TmsService {
     Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!healthy && DateTime.now().difference(lastReset) > tmsGracePeriod) {
         log.severe('TMS is stale. Resetting...');
+        lastReset = DateTime.now();
         reset();
       }
     });
@@ -103,8 +104,11 @@ class TmsService {
     config.parity = SerialPortParity.none;
     serialPort.config = config;
     log.config(
-        'Serial port configured with baudRate: ${config.baudRate}, bits: ${config.bits}, stopBits: ${config.stopBits}, parity: ${config.parity}');
-  }
+        'Serial port configured with baudRate: ${config.baudRate}, b
+
+
+        its: ${config.bits}, stopBits: ${config.stopBits}, parity: ${config.parity}');
+    }
 
   void _startListening() {
     final serialPort = _serialPort;
@@ -120,7 +124,7 @@ class TmsService {
         .bind(_serialPortReader!.stream)
         .transform(const LineSplitter())
         .listen(
-      (line) {
+          (line) {
         _processSerialData(line);
       },
       onError: (error) {
@@ -178,7 +182,7 @@ class TmsService {
     }
 
     Uint8List bytes =
-        Uint8List.fromList(utf8.encode(jsonEncode(command.toJson())));
+    Uint8List.fromList(utf8.encode(jsonEncode(command.toJson())));
     log.fine('Sending command to the device.');
     try {
       return serialPort.write(bytes, timeout: sendTimeout.inMilliseconds);
