@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_reflow/models/tms_status.dart';
+import 'package:flutter_reflow/models/tms/tms_status.dart';
 import 'package:provider/provider.dart';
 
 class DiagnosticsPage extends StatelessWidget {
@@ -9,7 +9,7 @@ class DiagnosticsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Consumer<TmsStatus>(builder: (context, TmsStatus status, child) {
-        return Column(children: [
+        return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('Current Temperature: ${status.currentTemperature}'),
           Text('Target Temperature: ${status.targetTemperature}'),
           Text('State ${status.state}'),

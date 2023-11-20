@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_reflow/models/tms_status.dart';
+import 'package:flutter_reflow/models/tms/tms_status.dart';
 import 'package:provider/provider.dart';
 
 /// The preferred height of the status bar
@@ -56,8 +56,14 @@ class Temperature extends StatelessWidget {
   Temperature(this._temperature, {Key? key}) : super(key: key) {
     // color white below 35 C, color red above 100 C, interpolate between based on temperature
     // calculate 0.0 -> 1.0 based on temperature range above
-    _temperatureColor = Color.lerp(Colors.white, Colors.red,
-        (_temperature.clamp(35.0, 100.0) - 35) / (100 - 35))!;
+
+    if (_temperature < 100.0) {
+      _temperatureColor = Color.lerp(Colors.white, Colors.orange,
+          (_temperature.clamp(35.0, 100.0) - 35) / (100 - 35))!;
+    } else {
+      _temperatureColor = Color.lerp(Colors.orange, Colors.red,
+          (_temperature.clamp(100.0, 250.0) - 100) / (250 - 100))!;
+    }
   }
 
   @override

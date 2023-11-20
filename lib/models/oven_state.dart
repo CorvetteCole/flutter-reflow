@@ -1,7 +1,7 @@
-import 'package:flutter_reflow/models/tms_status.dart';
+import 'package:flutter_reflow/models/tms/tms_status.dart';
 import 'package:flutter_reflow/models/heat_curve.dart';
 
-enum OvenState { idle, heating, cooling, error }
+enum OvenState { idle, running, error }
 
 // need to catch non-TMS error of accrued difference between target and current
 // temperature becoming too large

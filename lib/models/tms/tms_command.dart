@@ -1,4 +1,4 @@
-import 'package:flutter_reflow/models/tms_log.dart';
+import 'package:flutter_reflow/models/tms/tms_log.dart';
 
 abstract class TmsCommand {
 

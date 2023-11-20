@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_reflow/models/tms_log.dart';
-import 'package:flutter_reflow/models/tms_status.dart';
+import 'package:flutter_reflow/models/tms/tms_log.dart';
+import 'package:flutter_reflow/models/tms/tms_status.dart';
 import 'package:flutter_reflow/screens/diagnostic.dart';
 import 'package:libserialport/libserialport.dart';
 import 'package:flutter_reflow/screens/curve_select.dart';
@@ -14,7 +14,7 @@ import 'package:flutter_reflow/widgets/status_bar.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter_reflow/services/tms_service.dart';
 
-class MyCustomScrollBehavior extends MaterialScrollBehavior {
+class CustomScrollBehavior extends MaterialScrollBehavior {
   // Override behavior methods and getters like dragDevices
   @override
   Set<PointerDeviceKind> get dragDevices => {
@@ -81,7 +81,7 @@ class BasicApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      scrollBehavior: MyCustomScrollBehavior(),
+      scrollBehavior: CustomScrollBehavior(),
       theme: ThemeData(
           useMaterial3: true, colorSchemeSeed: const Color(0xff001748)),
       darkTheme: ThemeData.dark(),

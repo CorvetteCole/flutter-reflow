@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:logging/logging.dart';
 import 'dart:typed_data';
-import 'package:flutter_reflow/models/tms_status.dart';
-import 'package:flutter_reflow/models/tms_log.dart';
-import 'package:flutter_reflow/models/tms_command.dart';
+import 'package:flutter_reflow/models/tms/tms_status.dart';
+import 'package:flutter_reflow/models/tms/tms_log.dart';
+import 'package:flutter_reflow/models/tms/tms_command.dart';
 
 import 'package:libserialport/libserialport.dart';
 
