@@ -11,6 +11,7 @@ import 'package:libserialport/libserialport.dart';
 
 const sendTimeout = Duration(milliseconds: 100);
 const tmsStaleTimeout = Duration(seconds: 2);
+const tmsGracePeriod = Duration(seconds: 3);
 final log = Logger('TmsService');
 
 const Utf8Decoder utf8Decoder = Utf8Decoder(allowMalformed: true);
@@ -42,9 +43,10 @@ class TmsService {
   TmsService._() {
     _tmsResetLine.requestOutput(initialValue: true, consumer: 'flutter_reflow');
     _connect();
+    DateTime lastReset = DateTime.now();
     // on an interval, check the lastUpdated time and if it's stale, reset the TMS
     Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!healthy) {
+      if (!healthy && DateTime.now().difference(lastReset) > tmsGracePeriod) {
         log.severe('TMS is stale. Resetting...');
         reset();
       }
@@ -210,6 +212,5 @@ class TmsService {
       serialPort.dispose();
       _serialPort = null;
     }
-    _tmsResetLine.release();
   }
 }

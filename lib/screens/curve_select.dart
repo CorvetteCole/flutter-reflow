@@ -7,21 +7,12 @@ class CurveSelectPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-            title:
-                const Text('Select Curve', style: TextStyle(fontSize: 40))),
         body: ScrollConfiguration(
             behavior:
                 ScrollConfiguration.of(context).copyWith(scrollbars: false),
             child: ListView(
               padding: const EdgeInsets.all(10),
               children: [
-                CurveCard(),
-                CurveCard(),
-                CurveCard(),
-                CurveCard(),
-                CurveCard(),
-                CurveCard(),
                 CurveCard(),
                 CurveCard(),
               ],
