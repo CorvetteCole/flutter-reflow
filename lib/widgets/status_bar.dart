@@ -43,11 +43,9 @@ class StatusBar extends StatelessWidget implements PreferredSizeWidget {
                     builder: (context, num currentTemperature, child) {
                       return Temperature(currentTemperature);
                     }),
-                Selector<TmsService, bool>(
-                    selector: (context, tmsService) => tmsService.healthy,
-                    builder: (context, bool healthy, child) {
-                      return ConnectionStatus(healthy);
-                    })
+                Consumer<TmsService>(
+                    builder: (context, tmsService, child) =>
+                        ConnectionStatus(tmsService.healthy)),
               ],
             )));
   }
