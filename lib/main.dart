@@ -102,10 +102,10 @@ class RootPage extends StatefulWidget {
 class _RootPageState extends State<RootPage> {
   int _selectedIndex = 0;
 
-  static const List<Widget> _pages = <Widget>[
+  static final List<Widget> _pages = <Widget>[
     CurveSelectPage(),
-    DiagnosticsPage(),
-    SettingsPage(),
+    const DiagnosticsPage(),
+    const SettingsPage(),
   ];
 
   void _onItemTapped(int index) {
