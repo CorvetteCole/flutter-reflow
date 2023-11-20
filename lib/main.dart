@@ -40,8 +40,7 @@ void main() async {
     sp.dispose();
   }
 
-  TmsService tmsService = TmsService();
-  tmsService.connect();
+  TmsService tmsService = TmsService.connect();
 
   WidgetsFlutterBinding.ensureInitialized();
   // Must add this line.
