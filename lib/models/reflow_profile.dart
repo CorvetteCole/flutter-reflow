@@ -31,25 +31,29 @@ class ReflowProfile extends ChangeNotifier {
 
   Duration get duration => _points.last.time;
 
-  int getTemperature(int seconds) {
-    // find the two points that the current duration falls between
-    final firstPoint =
-        _points.firstWhere((element) => element.time.inSeconds >= seconds);
-    final secondPoint =
-        _points.firstWhere((element) => element.time.inSeconds > seconds);
-    // interpolate between the two points
-    final firstPointSeconds = firstPoint.time.inSeconds;
-    final secondPointSeconds = secondPoint.time.inSeconds;
-    final firstPointTemperature = firstPoint.temperature;
-    final secondPointTemperature = secondPoint.temperature;
-    final slope = (secondPointTemperature - firstPointTemperature) /
-        (secondPointSeconds - firstPointSeconds);
-    final temperature =
-        firstPointTemperature + slope * (seconds - firstPointSeconds);
-    // clamp the temperature to the range of the two points
-    return temperature.round().clamp(
-        min(firstPointTemperature, secondPointTemperature),
-        max(firstPointTemperature, secondPointTemperature));
+  int getTemperature(Duration currentTime) {
+// if the current time is before the first point, return the first point's temperature
+    if (currentTime < _points.first.time) {
+      return _points.first.temperature;
+    }
+    // if the current time is after the last point, return the last point's temperature
+    if (currentTime > _points.last.time) {
+      return _points.last.temperature;
+    }
+    // otherwise, find the two points that the current time is between and interpolate
+    for (var i = 0; i < _points.length - 1; i++) {
+      if (_points.elementAt(i).time <= currentTime &&
+          _points.elementAt(i + 1).time >= currentTime) {
+        final x1 = _points.elementAt(i).time.inSeconds;
+        final x2 = _points.elementAt(i + 1).time.inSeconds;
+        final y1 = _points.elementAt(i).temperature;
+        final y2 = _points.elementAt(i + 1).temperature;
+        final x = currentTime.inSeconds;
+        final y = ((y2 - y1) / (x2 - x1)) * (x - x1) + y1;
+        return y.round();
+      }
+    }
+    throw StateError('Could not find temperature for time $currentTime');
   }
 
   int get highestTemperature => _points
