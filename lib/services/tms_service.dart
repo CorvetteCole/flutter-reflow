@@ -276,13 +276,13 @@ class TmsService extends ChangeNotifier {
         _profileProgress = 0.0;
         return;
       }
-      final temperature = profile.getTemperature(startTime!.difference(
-          DateTime.now())); // get temperature for current profile time
+      final temperature = profile.getTemperature(DateTime.now()
+          .difference(startTime!)); // get temperature for current profile time
       log.finest(
-          'Calculated profile temperature: $temperature for time: ${startTime!.difference(DateTime.now())}, remaining: ${profile.duration - startTime!.difference(DateTime.now())}');
+          'Calculated profile temperature: $temperature for time: ${DateTime.now().difference(startTime!)}, remaining: ${profile.duration - DateTime.now().difference(startTime!)}');
       // send(TemperatureCommand(temperature));
       _targetTemperature = temperature;
-      _profileProgress = startTime!.difference(DateTime.now()).inSeconds /
+      _profileProgress = DateTime.now().difference(startTime!).inSeconds /
           profile.duration.inSeconds;
       notifyListeners();
     });
