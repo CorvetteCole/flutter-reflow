@@ -30,6 +30,20 @@ class ReflowProfile extends ChangeNotifier {
 
   Duration get duration => _points.last.time;
 
+  int getTemperature(int seconds) {
+    // find the two points that the current duration falls between
+    final firstPoint = _points.firstWhere((element) => element.time.inSeconds >= seconds);
+    final secondPoint = _points.firstWhere((element) => element.time.inSeconds > seconds);
+    // interpolate between the two points
+    final firstPointSeconds = firstPoint.time.inSeconds;
+    final secondPointSeconds = secondPoint.time.inSeconds;
+    final firstPointTemperature = firstPoint.temperature;
+    final secondPointTemperature = secondPoint.temperature;
+    final slope = (secondPointTemperature - firstPointTemperature) / (secondPointSeconds - firstPointSeconds);
+    final temperature = firstPointTemperature + slope * (seconds - firstPointSeconds);
+    return temperature.round();
+  }
+
   int get highestTemperature => _points
       .map((e) => e.temperature)
       .reduce((value, element) => value > element ? value : element);
