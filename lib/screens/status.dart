@@ -21,8 +21,8 @@ class StatusPage extends StatefulWidget {
 
 class _StatusPageState extends State<StatusPage> {
   DateTime? startTime;
-  late final TmsService _tmsService;
-  late final Timer _timer;
+  TmsService? _tmsService;
+  Timer? _timer;
 
   List<ReflowProfilePoint> actualPoints = [];
 
@@ -32,10 +32,10 @@ class _StatusPageState extends State<StatusPage> {
     final currentTemperature =
         context.select((TmsStatus status) => status.currentTemperature);
 
-    _tmsService = context.read<TmsService>();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_tmsService.targetTemperature == 0) {
-        _tmsService.targetTemperature = 35;
+    _tmsService ??= context.read<TmsService>();
+    _timer ??= Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_tmsService!.targetTemperature == 0) {
+        _tmsService!.targetTemperature = 35;
       } else if (currentTemperature >= 35) {
         startTime ??= DateTime.now();
         final currentDuration = startTime!.difference(DateTime.now());
@@ -44,14 +44,14 @@ class _StatusPageState extends State<StatusPage> {
               ReflowProfilePoint(currentDuration, currentTemperature.round()));
         });
         if (currentDuration >= widget.profile.duration) {
-          _timer.cancel();
-          _tmsService.targetTemperature = 0;
+          _timer!.cancel();
+          _tmsService!.targetTemperature = 0;
           Navigator.pop(context);
         } else {
           // get current target temperature by interpolating between points on the profile based on duration. Skip through until we are past 35C
           final targetTemperature =
               widget.profile.getTemperature(currentDuration.inSeconds);
-          _tmsService.targetTemperature = targetTemperature;
+          _tmsService!.targetTemperature = targetTemperature;
         }
       }
     });
@@ -67,6 +67,7 @@ class _StatusPageState extends State<StatusPage> {
                 children: <Widget>[
                   Text('Heating'),
                   Text('Caution: Do not open the door'),
+                  SizedBox(height: 10),
                   SfCartesianChart(
                     primaryXAxis: NumericAxis(),
                     primaryYAxis: NumericAxis(),
@@ -80,10 +81,18 @@ class _StatusPageState extends State<StatusPage> {
                       )
                     ],
                   ),
+                  SizedBox(height: 10),
+                  LinearProgressIndicator(
+                    value: startTime != null
+                        ? startTime!.difference(DateTime.now()).inSeconds /
+                            widget.profile.duration.inSeconds
+                        : 0,
+                  ),
+                  SizedBox(height: 10),
                   FilledButton(
                       onPressed: () => {
-                            _timer.cancel(),
-                            _tmsService.targetTemperature = 0,
+                            _timer!.cancel(),
+                            _tmsService!.targetTemperature = 0,
                             Navigator.pop(context),
                           },
                       child: const Text('Stop')),
