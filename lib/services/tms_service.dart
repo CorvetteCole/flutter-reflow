@@ -11,7 +11,7 @@ import 'package:libserialport/libserialport.dart';
 const sendTimeout = Duration(milliseconds: 100);
 final log = Logger('TmsService');
 
-final Utf8Decoder utf8Decoder = Utf8Decoder(allowMalformed: true);
+const Utf8Decoder utf8Decoder = Utf8Decoder(allowMalformed: true);
 
 class TmsService {
   SerialPort? _serialPort;

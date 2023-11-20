@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_reflow/models/tms_status.dart';
+import 'package:provider/provider.dart';
 
 /// The preferred height of the status bar
 const statusBarHeight = 32.0;
@@ -35,7 +37,9 @@ class StatusBar extends StatelessWidget implements PreferredSizeWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Temperature(),
+                Consumer<TmsStatus>(builder: (context, TmsStatus status, _) {
+                  return Temperature(status.currentTemperature);
+                }),
                 const ConnectionStatus(),
               ],
             )));
@@ -46,19 +50,24 @@ class StatusBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class Temperature extends StatelessWidget {
-  const Temperature({Key? key}) : super(key: key);
+  final num _temperature;
+  late final Color _temperatureColor;
+
+  Temperature(this._temperature, {Key? key}) : super(key: key) {
+    // color white below 35 C, color red above 100 C, interpolate between based on temperature
+    // calculate 0.0 -> 1.0 based on temperature range above
+    _temperatureColor = Color.lerp(Colors.white, Colors.red,
+        (_temperature.clamp(35.0, 100.0) - 35) / (100 - 35))!;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Row(children: [
-      Icon(Icons.thermostat_outlined,
-          size: 24, color: Colors.white),
+      Icon(Icons.thermostat_outlined, size: 24, color: _temperatureColor),
       Text(
-        '165°C',
-        style: TextStyle(
-            fontWeight: FontWeight.w400,
-            fontSize: 16,
-            color: Colors.white),
+        '${_temperature.round()}°C',
+        style: const TextStyle(
+            fontWeight: FontWeight.w400, fontSize: 16, color: Colors.white),
         textAlign: TextAlign.center,
       ),
     ]);
