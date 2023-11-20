@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_reflow/models/tms_log.dart';
 import 'package:flutter_reflow/models/tms_status.dart';
 import 'package:libserialport/libserialport.dart';
@@ -42,21 +43,25 @@ void main() async {
 
   TmsService tmsService = TmsService.connect();
 
-  WidgetsFlutterBinding.ensureInitialized();
-  // Must add this line.
-  await windowManager.ensureInitialized();
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
+    // Must add this line.
+    await windowManager.ensureInitialized();
 
-  WindowOptions windowOptions = const WindowOptions(
-    size: Size(320, 480),
-    center: true,
-    // backgroundColor: Colors.transparent,
-    // skipTaskbar: false,
-    // titleBarStyle: TitleBarStyle.hidden,
-  );
-  windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.show();
-    await windowManager.focus();
-  });
+    WindowOptions windowOptions = const WindowOptions(
+      size: Size(320, 480),
+      center: true,
+      // backgroundColor: Colors.transparent,
+      // skipTaskbar: false,
+      // titleBarStyle: TitleBarStyle.hidden,
+    );
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
+  } on MissingPluginException catch (e) {
+    log.warning('Missing plugin: $e');
+  }
 
   final providers = [
     StreamProvider<TmsStatus>.value(
@@ -84,8 +89,6 @@ class BasicApp extends StatelessWidget {
     );
   }
 }
-
-
 
 class RootPage extends StatefulWidget {
   const RootPage({Key? key}) : super(key: key);
