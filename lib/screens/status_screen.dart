@@ -44,7 +44,7 @@ class StatusScreenState extends State<StatusScreen> {
     if (ovenStatus.state == OvenState.fault) {
       return const ErrorScreen();
     }
-    if (ovenStatus.state == OvenState.cooling) {
+    if (ovenStatus.state == OvenState.cooling && !ovenStatus.doorOpen) {
       return const OpenDoorScreen();
     }
     if (reflowStatus.state == ControlState.complete) {
@@ -104,9 +104,10 @@ class StatusScreenState extends State<StatusScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                    'Current Temperature: ${ovenStatus.temperature.round()}°C'),
-                Text('Current State: ${reflowStatus.state.name}'),
+                Text('Current Temperature: ${ovenStatus.temperature.round()}°C',
+                    style: const TextStyle(fontSize: 20)),
+                Text('Current State: ${reflowStatus.state.name}',
+                    style: const TextStyle(fontSize: 20)),
                 // Add more status information as needed
                 const SizedBox(height: 24), // Add space before the button
                 ElevatedButton(

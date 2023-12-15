@@ -35,7 +35,7 @@ class VictoryScreen extends StatelessWidget {
               ),
               child: const Text(
                 'Dismiss',
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(fontSize: 20, color: Colors.white),
               ),
             ),
           ],
