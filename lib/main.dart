@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_reflow/models/tms/tms_log.dart';
-import 'package:flutter_reflow/models/tms/tms_status.dart';
-import 'package:flutter_reflow/screens/diagnostic.dart';
+import 'package:flutter_reflow/models/oven_status.dart';
+
 import 'package:libserialport/libserialport.dart';
 import 'package:flutter_reflow/screens/curve_select.dart';
 import 'package:flutter_reflow/screens/error.dart';
@@ -12,7 +11,13 @@ import 'package:window_manager/window_manager.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_reflow/widgets/status_bar.dart';
 import 'package:logging/logging.dart';
-import 'package:flutter_reflow/services/tms_service.dart';
+import 'package:flutter_reflow/services/api_service.dart';
+import 'package:flutter_reflow/services/socket_service.dart';
+import 'package:socket_io_client/socket_io_client.dart';
+
+import 'models/log_message.dart';
+import 'models/reflow_curve.dart';
+import 'models/reflow_status.dart';
 
 class CustomScrollBehavior extends MaterialScrollBehavior {
   // Override behavior methods and getters like dragDevices
@@ -24,25 +29,14 @@ class CustomScrollBehavior extends MaterialScrollBehavior {
       };
 }
 
+final log = Logger('main');
+
 void main() async {
+  // set logger level to all
+  Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen((record) {
     debugPrint('${record.level.name}: ${record.time}: ${record.message}');
   });
-
-  log.config('Available ports:');
-  var i = 0;
-  for (final name in SerialPort.availablePorts) {
-    final sp = SerialPort(name);
-    log.config('${++i}) $name');
-    log.config('\tDescription: ${sp.description}');
-    log.config('\tManufacturer: ${sp.manufacturer}');
-    log.config('\tSerial Number: ${sp.serialNumber}');
-    log.config('\tProduct ID: 0x${sp.productId!.toRadixString(16)}');
-    log.config('\tVendor ID: 0x${sp.vendorId!.toRadixString(16)}');
-    sp.dispose();
-  }
-
-  final tmsService = TmsService.connect();
 
   try {
     WidgetsFlutterBinding.ensureInitialized();
@@ -64,12 +58,33 @@ void main() async {
     log.warning('Missing plugin: $e');
   }
 
+  final ApiService apiService = ApiService('http://localhost:5000');
+  final Socket socket = io('http://localhost:5000',
+      OptionBuilder().setTransports(['websocket']).build());
+  final SocketService socketService = SocketService(socket);
+
   final providers = [
-    ChangeNotifierProvider<TmsService>.value(value: tmsService),
-    StreamProvider<TmsStatus>.value(
-        value: tmsService.statusStream, initialData: TmsStatus.unknown()),
-    StreamProvider<TmsLog>.value(
-        value: tmsService.logStream, initialData: TmsLog.unknown()),
+    StreamProvider<OvenStatus>.value(
+        initialData: OvenStatus(
+            time: 0,
+            temperature: 0,
+            state: OvenState.idle,
+            dutyCycle: 0,
+            doorOpen: false),
+        value: socketService.ovenStatusStream),
+    StreamProvider<ReflowStatus>.value(
+        initialData: ReflowStatus(
+            actualTemperatures: ReflowCurve(
+                times: const <int>[], temperatures: const <double>[]),
+            state: ControlState.idle),
+        value: socketService.reflowStatusStream),
+    StreamProvider<LogMessage>.value(
+        initialData: LogMessage(
+            severity: LogSeverity.info,
+            message: 'Welcome to Flutter Reflow',
+            time: DateTime.now().second),
+        value: socketService.logMessageStream),
+    Provider<ApiService>.value(value: apiService),
   ];
 
   runApp(MultiProvider(providers: providers, child: const BasicApp()));
@@ -104,7 +119,6 @@ class _RootPageState extends State<RootPage> {
 
   static final List<Widget> _pages = <Widget>[
     CurveSelectPage(),
-    const DiagnosticsPage(),
     const SettingsPage(),
   ];
 
@@ -116,37 +130,31 @@ class _RootPageState extends State<RootPage> {
 
   @override
   Widget build(BuildContext context) {
-    final hasErrors = context.select((TmsStatus status) => status.hasErrors);
-
     return Scaffold(
         appBar: const StatusBar(),
         body: Center(
-          child: hasErrors
-              ? const ErrorScreen()
-              : _pages.elementAt(_selectedIndex),
+          child: _pages.elementAt(_selectedIndex),
         ),
-        bottomNavigationBar: hasErrors
-            ? const SizedBox(width: 0, height: 0)
-            : NavigationBar(
-                onDestinationSelected: _onItemTapped,
-                selectedIndex: _selectedIndex,
-                destinations: const <NavigationDestination>[
-                  NavigationDestination(
-                    icon: Icon(Icons.whatshot_outlined),
-                    selectedIcon: Icon(Icons.whatshot),
-                    label: 'Heat',
-                  ),
-                  NavigationDestination(
-                    icon: Icon(Icons.info_outline),
-                    selectedIcon: Icon(Icons.info),
-                    label: 'Info',
-                  ),
-                  NavigationDestination(
-                    icon: Icon(Icons.settings_outlined),
-                    selectedIcon: Icon(Icons.settings),
-                    label: 'Settings',
-                  ),
-                ],
-              ));
+        bottomNavigationBar: NavigationBar(
+          onDestinationSelected: _onItemTapped,
+          selectedIndex: _selectedIndex,
+          destinations: const <NavigationDestination>[
+            NavigationDestination(
+              icon: Icon(Icons.whatshot_outlined),
+              selectedIcon: Icon(Icons.whatshot),
+              label: 'Heat',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.info_outline),
+              selectedIcon: Icon(Icons.info),
+              label: 'Info',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.settings_outlined),
+              selectedIcon: Icon(Icons.settings),
+              label: 'Settings',
+            ),
+          ],
+        ));
   }
 }

@@ -1,0 +1,354 @@
+{
+  "options": {
+    "extensions": {
+      "x-socketio": {
+        "events": {
+          "connect": {
+            "description": "Client connected to Socket.IO",
+            "responses": {
+              "200": {
+                "description": "Connection established"
+              }
+            }
+          },
+          "disconnect": {
+            "description": "Client disconnected from Socket.IO",
+            "responses": {
+              "200": {
+                "description": "Disconnection successful"
+              }
+            }
+          },
+          "reflow_status": {
+            "description": "Emit the current status of the reflow process",
+            "responses": {
+              "200": {
+                "description": "Reflow status emitted",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ReflowStatus"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "oven_status": {
+            "description": "Emit the current status of the oven",
+            "responses": {
+              "200": {
+                "description": "Oven status emitted",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/OvenStatus"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "log_message": {
+            "description": "Emit a log message",
+            "responses": {
+              "200": {
+                "description": "Log message emitted",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/LogMessage"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/start_curve": {
+      "post": {
+        "description": "Start the thermal curve process with the provided curve points.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReflowCurve"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Curve process started."
+          },
+          "400": {
+            "description": "Missing or invalid input."
+          }
+        }
+      }
+    },
+    "/curve_status": {
+      "get": {
+        "description": "Get the current status of the thermal curve process.",
+        "responses": {
+          "200": {
+            "description": "Current status of the curve process.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ControlStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stop_curve": {
+      "post": {
+        "description": "Stop the thermal curve process.",
+        "responses": {
+          "200": {
+            "description": "Curve process stopped."
+          },
+          "400": {
+            "description": "Missing or invalid input."
+          }
+        }
+      }
+    },
+    "/reset": {
+      "post": {
+        "description": "Reset the device.",
+        "responses": {
+          "200": {
+            "description": "Device reset."
+          },
+          "400": {
+            "description": "Missing or invalid input."
+          }
+        }
+      }
+    },
+    "/logs": {
+      "get": {
+        "description": "Get the current logs.",
+        "responses": {
+          "200": {
+            "description": "Current logs.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogMessages"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oven_status": {
+      "get": {
+        "description": "Get the current status of the oven.",
+        "responses": {
+          "200": {
+            "description": "Current status of the oven.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OvenStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "info": {
+    "title": "Thermal Curve API",
+    "version": "1.0.0"
+  },
+  "openapi": "3.0.2",
+  "components": {
+    "schemas": {
+      "ReflowCurve": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the curve"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the curve"
+          },
+          "times": {
+            "type": "array",
+            "description": "Array of times in seconds",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "temperatures": {
+            "type": "array",
+            "description": "Array of temperatures in degrees Celsius",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "required": [
+          "temperatures",
+          "times"
+        ]
+      },
+      "ReflowStatus": {
+        "type": "object",
+        "properties": {
+          "actual_temperatures": {
+            "description": "Array of points defining the actual curve so far",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ReflowCurve"
+              }
+            ]
+          },
+          "state": {
+            "description": "Current state of the reflow process",
+            "enum": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ]
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if state is FAULT"
+          }
+        },
+        "required": [
+          "state"
+        ]
+      },
+      "ControlStatus": {
+        "type": "object",
+        "properties": {
+          "curve": {
+            "description": "The curve data",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ReflowCurve"
+              }
+            ]
+          },
+          "reflow": {
+            "description": "The control data",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ReflowStatus"
+              }
+            ]
+          }
+        },
+        "required": [
+          "curve",
+          "reflow"
+        ]
+      },
+      "LogMessage": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "The log message"
+          },
+          "severity": {
+            "description": "Severity of the log message",
+            "enum": [
+              0,
+              1,
+              2,
+              3
+            ]
+          },
+          "time": {
+            "type": "integer",
+            "description": "Time of the log message in milliseconds since startup"
+          }
+        },
+        "required": [
+          "message",
+          "severity",
+          "time"
+        ]
+      },
+      "LogMessages": {
+        "type": "object",
+        "properties": {
+          "logs": {
+            "type": "array",
+            "description": "Array of log messages",
+            "items": {
+              "$ref": "#/components/schemas/LogMessage"
+            }
+          }
+        },
+        "required": [
+          "logs"
+        ]
+      },
+      "OvenStatus": {
+        "type": "object",
+        "properties": {
+          "time": {
+            "type": "integer",
+            "description": "Time in milliseconds since startup"
+          },
+          "temperature": {
+            "type": "number",
+            "description": "The current temperature of the oven"
+          },
+          "state": {
+            "description": "The current state of the oven",
+            "enum": [
+              0,
+              1,
+              2,
+              3
+            ]
+          },
+          "duty_cycle": {
+            "type": "integer",
+            "description": "The current duty cycle of the oven"
+          },
+          "door_open": {
+            "type": "boolean",
+            "description": "Whether the oven door is open or not"
+          },
+          "errors": {
+            "type": "array",
+            "description": "Array of errors if state is FAULT",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "door_open",
+          "duty_cycle",
+          "state",
+          "temperature",
+          "time"
+        ]
+      }
+    }
+  }
+}

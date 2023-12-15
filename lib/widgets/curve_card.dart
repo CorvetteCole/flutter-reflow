@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_reflow/models/heat_curve.dart';
-import 'package:flutter_reflow/models/reflow_profile.dart';
+import 'package:flutter_reflow/models/reflow_curve.dart';
+
 
 class CurveCard extends StatelessWidget {
-  final ReflowProfile profile;
+  final ReflowCurve curve;
   final void Function()? onTap;
 
-  const CurveCard(this.profile, {Key? key, this.onTap}) : super(key: key);
+  const CurveCard(this.curve, {Key? key, this.onTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -34,11 +34,11 @@ class CurveCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        profile.name,
+                        curve.name!,
                         style: const TextStyle(
                             fontWeight: FontWeight.w400, fontSize: 22),
                       ),
-                      Text('${profile.manufacturer} ${profile.model}',
+                      Text(curve.description!,
                           style: const TextStyle(
                               fontWeight: FontWeight.w400, fontSize: 14)),
                     ],
@@ -47,10 +47,10 @@ class CurveCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text('${profile.highestTemperature}°C',
+                      Text('${curve.maxTemperature}°C',
                           style: const TextStyle(
                               fontWeight: FontWeight.w400, fontSize: 14)),
-                      Text('${profile.duration.inSeconds} seconds',
+                      Text('${curve.duration.inSeconds} seconds',
                           style: const TextStyle(
                               fontWeight: FontWeight.w400, fontSize: 14)),
                     ],

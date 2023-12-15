@@ -1,39 +1,46 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_reflow/models/reflow_profile.dart';
-import 'package:flutter_reflow/screens/status.dart';
-import 'package:flutter_reflow/services/tms_service.dart';
+import 'package:flutter_reflow/models/reflow_curve.dart';
+import 'package:flutter_reflow/screens/status_screen.dart';
+import 'package:flutter_reflow/services/api_service.dart';
 import 'package:flutter_reflow/widgets/curve_card.dart';
 import 'package:provider/provider.dart';
 
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-final leadedProfile = ReflowProfile.fromJson(jsonDecode(
-    r'{"name": "Leaded", "model":"SMD4300AX10", "manufacturer":"Chip Quik©", "points":[[0,25],[30,100],[120,150],[150,183],[210,235],[240,183]]}'));
+final leadedCurve = ReflowCurve(
+  name: "Leaded",
+  description: "Chip Quik© SMD4300AX10",
+  times: [0, 30, 120, 150, 210, 240],
+  temperatures: [25, 100, 150, 183, 235, 183],
+);
 
-final unleadedProfile = ReflowProfile.fromJson(jsonDecode(
-    r'{"name": "Unleaded","model":"TS391LT","manufacturer":"Chip Quik©","points":[[0,35],[90,90],[180,130],[210,138],[240,165],[270,138]]}'));
+final unleadedCurve = ReflowCurve(
+  name: "Unleaded",
+  description: "Chip Quik© TS391LT",
+  times: [0, 90, 180, 210, 240, 270],
+  temperatures: [35, 90, 130, 138, 165, 138],
+);
 
 class CurveSelectPage extends StatelessWidget {
   CurveSelectPage({Key? key}) : super(key: key);
 
-  final List<ReflowProfile> profiles = [unleadedProfile, leadedProfile];
+  final List<ReflowCurve> curves = [unleadedCurve, leadedCurve];
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
         padding: const EdgeInsets.all(10),
-        itemCount: profiles.length,
+        itemCount: curves.length,
         itemBuilder: (context, index) {
           return CurveCard(
-            profiles[index],
+            curves[index],
             onTap: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          CurveDetailsScreen(profiles[index])));
+                      builder: (context) => CurveDetailsScreen(curves[index])));
             },
           );
         });
@@ -41,9 +48,9 @@ class CurveSelectPage extends StatelessWidget {
 }
 
 class CurveDetailsScreen extends StatelessWidget {
-  final ReflowProfile profile;
+  final ReflowCurve curve;
 
-  const CurveDetailsScreen(this.profile, {Key? key}) : super(key: key);
+  const CurveDetailsScreen(this.curve, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -59,11 +66,11 @@ class CurveDetailsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      profile.name,
+                      curve.name!,
                       style: const TextStyle(fontSize: 22),
                     ),
                     Text(
-                      '${profile.manufacturer} ${profile.model}',
+                      curve.description!,
                       style: const TextStyle(fontSize: 14),
                     ),
                     const SizedBox(height: 16),
@@ -77,12 +84,16 @@ class CurveDetailsScreen extends StatelessWidget {
                           title: AxisTitle(text: 'Temperature (°C)'),
                         ),
                         series: <ChartSeries>[
-                          LineSeries<ReflowProfilePoint, int>(
-                            dataSource: profile.points,
-                            xValueMapper: (ReflowProfilePoint point, _) =>
-                                point.time.inSeconds,
-                            yValueMapper: (ReflowProfilePoint point, _) =>
-                                point.temperature,
+                          LineSeries<MapEntry<int, double>, int>(
+                            dataSource: List<MapEntry<int, double>>.generate(
+                              curve.times.length,
+                              (index) => MapEntry(curve.times[index],
+                                  curve.temperatures[index]),
+                            ),
+                            xValueMapper: (MapEntry<int, double> entry, _) =>
+                                entry.key,
+                            yValueMapper: (MapEntry<int, double> entry, _) =>
+                                entry.value,
                           )
                         ],
                       ),
@@ -97,7 +108,7 @@ class CurveDetailsScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: 2),
                         Text(
-                          '${profile.highestTemperature}°C',
+                          '${curve.maxTemperature}°C',
                           style: const TextStyle(fontSize: 14),
                         ),
                       ],
@@ -111,7 +122,7 @@ class CurveDetailsScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: 2),
                         Text(
-                          '${profile.duration.inSeconds} seconds',
+                          '${curve.duration.inSeconds} seconds',
                           style: const TextStyle(fontSize: 14),
                         ),
                       ],
@@ -119,12 +130,12 @@ class CurveDetailsScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     FilledButton(
                         onPressed: () => {
-                              context.read<TmsService>().runProfile(profile),
+                              context.read<ApiService>().startCurve(curve),
                               Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                          StatusPage(profile)))
+                                          StatusScreen(targetCurve: curve)))
                             },
                         style: FilledButton.styleFrom(
                           // foregroundColor: Colors.white,

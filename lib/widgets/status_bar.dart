@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_reflow/models/tms/tms_status.dart';
-import 'package:flutter_reflow/services/tms_service.dart';
+import 'package:flutter_reflow/models/oven_status.dart';
 import 'package:provider/provider.dart';
 
 /// The preferred height of the status bar
@@ -38,12 +37,11 @@ class StatusBar extends StatelessWidget implements PreferredSizeWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Selector<TmsStatus, num>(
-                    selector: (context, status) => status.currentTemperature,
+                Selector<OvenStatus, num>(
+                    selector: (context, status) => status.temperature,
                     builder: (context, num currentTemperature, child) {
                       return Temperature(currentTemperature);
                     }),
-                const ConnectionStatus(),
               ],
             )));
   }
@@ -80,23 +78,5 @@ class Temperature extends StatelessWidget {
         textAlign: TextAlign.center,
       ),
     ]);
-  }
-}
-
-/// Widget that displays the websocket connection status in a friendly manner
-class ConnectionStatus extends StatelessWidget {
-  const ConnectionStatus({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<TmsService>(builder: (context, TmsService service, child) {
-      return Row(children: [
-        Icon(Icons.monitor_heart_outlined,
-            size: 24,
-            color: service.isConnected
-                ? Colors.green
-                : Theme.of(context).colorScheme.error)
-      ]);
-    });
   }
 }
