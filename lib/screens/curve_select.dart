@@ -32,7 +32,7 @@ class _CurveSelectPageState extends State<CurveSelectPage> {
         context,
         MaterialPageRoute(
           builder: (context) => StatusScreen(targetCurve: controlStatus.curve),
-        ),
+        ), // This condition prevents any route from being kept on the stack.
       );
     }
   }

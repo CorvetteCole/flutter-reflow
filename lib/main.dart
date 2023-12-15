@@ -8,7 +8,7 @@ import 'package:flutter_reflow/providers/curve_provider.dart';
 import 'package:libserialport/libserialport.dart';
 import 'package:flutter_reflow/screens/curve_select.dart';
 import 'package:flutter_reflow/screens/error.dart';
-import 'package:flutter_reflow/screens/settings.dart';
+import 'package:flutter_reflow/screens/diagnostics.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter/gestures.dart';
@@ -142,8 +142,8 @@ class _RootPageState extends State<RootPage> {
   }
 
   static final List<Widget> _pages = <Widget>[
-    CurveSelectPage(),
-    const SettingsPage(),
+    const CurveSelectPage(),
+    const DiagnosticsPage(),
   ];
 
   void _onItemTapped(int index) {

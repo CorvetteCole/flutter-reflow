@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:flutter_reflow/models/log_messages.dart';
+import 'package:flutter_reflow/models/oven_status.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_reflow/models/reflow_curve.dart';
 import 'package:flutter_reflow/models/control_status.dart';
@@ -56,6 +58,24 @@ class ApiService {
       return ControlStatus.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to get curve status');
+    }
+  }
+
+  Future<OvenStatus> getOvenStatus() async {
+    final response = await http.get(Uri.parse('$baseUrl/oven_status'));
+    if (response.statusCode == 200) {
+      return OvenStatus.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to get oven status');
+    }
+  }
+
+  Future<LogMessages> getLogMessages() async {
+    final response = await http.get(Uri.parse('$baseUrl/logs'));
+    if (response.statusCode == 200) {
+      return LogMessages.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to get log messages');
     }
   }
 
