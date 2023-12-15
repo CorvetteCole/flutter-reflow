@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_reflow/models/oven_status.dart';
 import 'package:flutter_reflow/models/reflow_curve.dart';
 import 'package:flutter_reflow/models/reflow_status.dart';
+import 'package:flutter_reflow/screens/victory.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../services/api_service.dart';
 import 'error.dart';
+import 'open_door.dart';
 
 class StatusScreen extends StatefulWidget {
   final ReflowCurve targetCurve;
@@ -41,6 +43,12 @@ class StatusScreenState extends State<StatusScreen> {
 
     if (ovenStatus.state == OvenState.fault) {
       return const ErrorScreen();
+    }
+    if (ovenStatus.state == OvenState.cooling) {
+      return const OpenDoorScreen();
+    }
+    if (reflowStatus.state == ControlState.complete) {
+      return const VictoryScreen();
     }
 
     return Scaffold(
@@ -96,7 +104,8 @@ class StatusScreenState extends State<StatusScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Current Temperature: ${ovenStatus.temperature.round()}°C'),
+                Text(
+                    'Current Temperature: ${ovenStatus.temperature.round()}°C'),
                 Text('Current State: ${reflowStatus.state.name}'),
                 // Add more status information as needed
                 const SizedBox(height: 24), // Add space before the button
@@ -108,9 +117,12 @@ class StatusScreenState extends State<StatusScreen> {
                     minimumSize:
                         const Size(double.infinity, 60), // make the button big
                   ),
-                  child: const Text(
-                    'Cancel',
-                    style: TextStyle(fontSize: 20), // big text for the button
+                  child: Text(
+                    reflowStatus.state == ControlState.complete
+                        ? 'Done'
+                        : 'Cancel',
+                    style: const TextStyle(
+                        fontSize: 20), // big text for the button
                   ),
                 ),
               ],
