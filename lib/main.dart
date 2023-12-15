@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_reflow/models/oven_status.dart';
+import 'package:flutter_reflow/providers/curve_provider.dart';
 
 import 'package:libserialport/libserialport.dart';
 import 'package:flutter_reflow/screens/curve_select.dart';
@@ -63,7 +66,12 @@ void main() async {
       OptionBuilder().setTransports(['websocket']).build());
   final SocketService socketService = SocketService(socket);
 
+  // Define a new class to hold the list of curves
+  final CurveProvider curveProvider = CurveProvider(apiService);
+  curveProvider.fetchCurves();
+
   final providers = [
+    ChangeNotifierProvider<CurveProvider>.value(value: curveProvider),
     StreamProvider<OvenStatus>.value(
         initialData: OvenStatus(
             time: 0,
@@ -116,6 +124,22 @@ class RootPage extends StatefulWidget {
 
 class _RootPageState extends State<RootPage> {
   int _selectedIndex = 0;
+  StreamSubscription<OvenStatus>? _ovenStatusSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   static final List<Widget> _pages = <Widget>[
     CurveSelectPage(),
@@ -148,12 +172,7 @@ class _RootPageState extends State<RootPage> {
               icon: Icon(Icons.info_outline),
               selectedIcon: Icon(Icons.info),
               label: 'Info',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.settings_outlined),
-              selectedIcon: Icon(Icons.settings),
-              label: 'Settings',
-            ),
+            )
           ],
         ));
   }

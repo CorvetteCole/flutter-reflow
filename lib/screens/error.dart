@@ -20,14 +20,8 @@ class _ErrorScreenState extends State<ErrorScreen> {
     });
 
     context.read<ApiService>().reset().then((_) {
-      setState(() {
-        _isLoading = false;
-      });
-    }).catchError((error) {
-      setState(() {
-        _isLoading = false;
-      });
-      // Handle the error or show an error message
+      // pop from navigator
+      Navigator.of(context).pop();
     });
   }
 

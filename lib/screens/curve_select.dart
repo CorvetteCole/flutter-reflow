@@ -1,7 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_reflow/models/reflow_curve.dart';
+import 'package:flutter_reflow/providers/curve_provider.dart';
 import 'package:flutter_reflow/screens/status_screen.dart';
 import 'package:flutter_reflow/services/api_service.dart';
 import 'package:flutter_reflow/widgets/curve_card.dart';
@@ -9,41 +8,61 @@ import 'package:provider/provider.dart';
 
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-final leadedCurve = ReflowCurve(
-  name: "Leaded",
-  description: "Chip Quik© SMD4300AX10",
-  times: [0, 30, 120, 150, 210, 240],
-  temperatures: [25, 100, 150, 183, 235, 183],
-);
+import '../models/reflow_status.dart';
 
-final unleadedCurve = ReflowCurve(
-  name: "Unleaded",
-  description: "Chip Quik© TS391LT",
-  times: [0, 90, 180, 210, 240, 270],
-  temperatures: [35, 90, 130, 138, 165, 138],
-);
+class CurveSelectPage extends StatefulWidget {
+  const CurveSelectPage({Key? key}) : super(key: key);
 
-class CurveSelectPage extends StatelessWidget {
-  CurveSelectPage({Key? key}) : super(key: key);
+  @override
+  _CurveSelectPageState createState() => _CurveSelectPageState();
+}
 
-  final List<ReflowCurve> curves = [unleadedCurve, leadedCurve];
+class _CurveSelectPageState extends State<CurveSelectPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkAndNavigate());
+  }
+
+  void _checkAndNavigate() async {
+    final controlStatus = await context.read<ApiService>().getCurveStatus();
+    if (controlStatus.reflow.state == ControlState.running ||
+        controlStatus.reflow.state == ControlState.preparing) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => StatusScreen(targetCurve: controlStatus.curve),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        padding: const EdgeInsets.all(10),
-        itemCount: curves.length,
-        itemBuilder: (context, index) {
-          return CurveCard(
-            curves[index],
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => CurveDetailsScreen(curves[index])));
-            },
-          );
-        });
+    // The rest of the build method remains unchanged
+    return Consumer<CurveProvider>(
+      builder: (context, curveProvider, child) {
+        // The rest of the builder method remains unchanged
+        return RefreshIndicator(
+            onRefresh: curveProvider.fetchCurves,
+            child: ListView.builder(
+              padding: const EdgeInsets.all(4),
+              itemCount: curveProvider.curves.length,
+              itemBuilder: (context, index) {
+                final curve = curveProvider.curves[index];
+                return CurveCard(
+                  curve,
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => CurveDetailsScreen(curve)));
+                  },
+                );
+              },
+            ));
+      },
+    );
   }
 }
 
@@ -61,7 +80,7 @@ class CurveDetailsScreen extends StatelessWidget {
       body: Card(
           margin: const EdgeInsets.all(10),
           child: Container(
-              margin: const EdgeInsets.all(16),
+              margin: const EdgeInsets.all(8),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -140,7 +159,7 @@ class CurveDetailsScreen extends StatelessWidget {
                         style: FilledButton.styleFrom(
                           // foregroundColor: Colors.white,
                           // backgroundColor: Theme.of(context).colorScheme.primary,
-                          minimumSize: const Size(268, 40),
+                          minimumSize: const Size(268, 60),
                         ),
                         child: const Text('Start')),
                   ]))),

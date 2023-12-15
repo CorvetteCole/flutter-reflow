@@ -8,6 +8,37 @@ class ApiService {
 
   ApiService(this.baseUrl);
 
+  Future<String> saveCurve(ReflowCurve curve) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/save_curve/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(curve.toJson()),
+    );
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      throw Exception('Failed to save curve');
+    }
+  }
+
+  Future<void> deleteCurve(String curveId) async {
+    final response =
+        await http.delete(Uri.parse('$baseUrl/delete_curve/$curveId'));
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete curve');
+    }
+  }
+
+  Future<List<ReflowCurve>> getCurves() async {
+    final response = await http.get(Uri.parse('$baseUrl/curves'));
+    if (response.statusCode == 200) {
+      final curves = jsonDecode(response.body) as List;
+      return curves.map((e) => ReflowCurve.fromJson(e)).toList();
+    } else {
+      throw Exception('Failed to get curves');
+    }
+  }
+
   Future<void> startCurve(ReflowCurve curve) async {
     final response = await http.post(
       Uri.parse('$baseUrl/start_curve'),

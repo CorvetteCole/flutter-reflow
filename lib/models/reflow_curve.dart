@@ -6,12 +6,14 @@ part 'reflow_curve.g.dart';
 class ReflowCurve {
   final String? name;
   final String? description;
+  final String? id;
   final List<int> times;
   final List<double> temperatures;
 
   ReflowCurve({
     this.name,
     this.description,
+    this.id,
     required this.times,
     required this.temperatures,
   });

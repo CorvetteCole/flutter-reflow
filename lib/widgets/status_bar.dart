@@ -42,6 +42,11 @@ class StatusBar extends StatelessWidget implements PreferredSizeWidget {
                     builder: (context, num currentTemperature, child) {
                       return Temperature(currentTemperature);
                     }),
+                Selector<OvenStatus, OvenState>(
+                    selector: (context, status) => status.state,
+                    builder: (context, OvenState state, child) {
+                      return OvenHealth(state);
+                    }),
               ],
             )));
   }
@@ -78,5 +83,20 @@ class Temperature extends StatelessWidget {
         textAlign: TextAlign.center,
       ),
     ]);
+  }
+}
+
+/// Widget that displays the oven health in a friendly manner
+class OvenHealth extends StatelessWidget {
+  final OvenState _state;
+
+  const OvenHealth(this._state, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+
+
+    return Icon(Icons.monitor_heart_outlined,
+        size: 24, color: _state ==  OvenState.fault ? Colors.red : Colors.green);
   }
 }
